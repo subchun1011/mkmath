@@ -1,0 +1,16 @@
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  font-family: 'Trebuchet MS', 'Noto Sans KR', sans-serif;
+  background: #5c94fc;
+}
+
+* {
+  box-sizing: border-box;
+}

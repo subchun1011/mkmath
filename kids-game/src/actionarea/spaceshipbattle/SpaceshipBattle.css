@@ -1,0 +1,147 @@
+/* src/actionarea/spaceshipbattle/SpaceshipBattle.css */
+
+.space-battle {
+  width: 100%;
+  height: 100%;
+  /* 깊은 우주 느낌을 위한 다크 그라데이션 */
+  background: radial-gradient(ellipse at bottom, #1B2735 0%, #000000 100%);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 배경에 반짝이는 별 효과 추가 */
+.space-battle::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-image: 
+    radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+    radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px);
+  background-size: 550px 550px, 350px 350px;
+  background-position: 0 0, 40px 60px;
+  opacity: 0.2;
+  animation: stars-twinkle 4s infinite linear;
+}
+
+@keyframes stars-twinkle {
+  from { transform: translateY(0); }
+  to { transform: translateY(-350px); }
+}
+
+.space-battle__ships {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 40px;
+  z-index: 1; /* 별보다 위로 오도록 */
+}
+
+/* 우주선 각각의 컨테이너 */
+.space-battle__ship {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: 140px; 
+  height: 160px; /* 잘림 방지를 위해 높이를 살짝 더 확보 */
+  justify-content: center;
+}
+
+.ship-sprite-wrapper {
+  transition: transform 0.1s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* --- 애니메이션: 발사 반동 --- */
+
+.fire-recoil-p .ship-sprite-wrapper {
+  animation: recoil-p 0.3s ease;
+}
+
+@keyframes recoil-p {
+  0% { transform: translateX(0); }
+  30% { transform: translateX(-15px); }
+  100% { transform: translateX(0); }
+}
+
+.fire-recoil-e .ship-sprite-wrapper {
+  animation: recoil-e 0.3s ease;
+}
+
+@keyframes recoil-e {
+  0% { transform: translateX(0); }
+  30% { transform: translateX(15px); }
+  100% { transform: translateX(0); }
+}
+
+/* --- 애니메이션: 미사일 비행 --- */
+
+.space-battle__missile {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* 플레이어 미사일: 비행선 중앙 높이(50%)에서 출발 */
+.animate-player {
+  left: 25%;
+  top: 52%; /* 이미지에 맞춰 미세 조정 */
+  animation: missile-to-right 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes missile-to-right {
+  0% { left: 25%; opacity: 0; transform: scale(0.5); }
+  20% { opacity: 1; transform: scale(1.1); }
+  80% { left: 75%; opacity: 1; transform: scale(1); }
+  100% { left: 80%; opacity: 0; }
+}
+
+/* 적 미사일: 비행선 중앙 높이(50%)에서 출발 */
+.animate-enemy {
+  right: 25%;
+  top: 52%; /* 이미지에 맞춰 미세 조정 */
+  animation: missile-to-left 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes missile-to-left {
+  0% { right: 25%; opacity: 0; transform: scale(0.5); }
+  20% { opacity: 1; transform: scale(1.1); }
+  80% { right: 75%; opacity: 1; transform: scale(1); }
+  100% { right: 80%; opacity: 0; }
+}
+
+/* --- UI 요소 --- */
+
+.vs-logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #ffde59;
+  text-shadow: 0 0 10px rgba(255, 222, 89, 0.8);
+  font-family: 'Arial Black', sans-serif;
+  z-index: 2;
+}
+
+.space-battle__hp-bar {
+  width: 70px;
+  height: 6px;
+  background: #333;
+  border: 1px solid #555;
+  border-radius: 5px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+.space-battle__hp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff4d4d, #ff8080);
+  transition: width 0.4s ease-out;
+}

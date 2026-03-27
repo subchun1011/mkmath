@@ -1,0 +1,75 @@
+.input-area-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.input-display {
+  min-height: 64px;
+  border-radius: 22px;
+  border: 4px solid #ffd166;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 900;
+  color: #24506b;
+}
+
+.placeholder {
+  color: #d1b252;
+}
+
+.keypad {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.keypad button {
+  min-height: 54px;
+  border: none;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #24506b;
+  font-size: 1.15rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(36, 80, 107, 0.12);
+}
+
+.btn-clear {
+  background: #ffd9a0;
+}
+
+.btn-confirm {
+  background: #53d769;
+  color: #ffffff;
+}
+
+.shake {
+  animation: inputShake 0.4s ease;
+}
+
+@keyframes inputShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(6px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+}

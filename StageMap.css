@@ -1,0 +1,236 @@
+.map-container {
+  width: 100%;
+  height: 100vh;
+  background: #5c94fc; /* 슈퍼마리오 하늘색 */
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-svg {
+  width: 90%;
+  max-width: 800px;
+  background: #88d05b; /* 잔디밭 색상 */
+  border: 10px solid #fff;
+  border-radius: 20px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.stage-node {
+  transition: transform 0.2s;
+}
+
+.stage-node.unlocked { fill: #fff; stroke: #e74c3c; stroke-width: 5; }
+.stage-node.locked { fill: #7f8c8d; stroke: #34495e; stroke-width: 5; }
+
+.stage-label {
+  font-weight: bold;
+  font-size: 14px;
+  fill: #333;
+  pointer-events: none;
+}
+
+.player-icon {
+  fill: #e74c3c;
+  stroke: #fff;
+  stroke-width: 3;
+  transition: all 0.5s ease-in-out;
+  filter: drop-shadow(0 0 5px gold);
+}
+
+.map-title {
+  margin-top: 20px;
+  font-size: 24px;
+  color: white;
+  text-shadow: 2px 2px #000;
+}
+
+.stage-enter-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(23, 41, 74, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stage-enter-card {
+  padding: 18px 28px;
+  border-radius: 20px;
+  background: #fff8d6;
+  border: 4px solid #ffce00;
+  font-size: 24px;
+  font-weight: 800;
+  color: #5b4300;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.game-timer-panel {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.game-timer-text {
+  min-width: 90px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #27506a;
+}
+
+.game-timer-track {
+  flex: 1;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(39, 80, 106, 0.14);
+  overflow: hidden;
+}
+
+.game-timer-fill {
+  width: 72%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #53d769 0%, #ffd86b 60%, #ff7b72 100%);
+}
+
+.robot-action-panel {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.robot-stage-badge {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 3px solid #8bd0ff;
+  font-size: 16px;
+  font-weight: 800;
+  color: #24506b;
+}
+
+.robot-preview {
+  width: min(240px, 70vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.robot-head-slot {
+  width: 110px;
+  height: 110px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 4px solid #79c6f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.robot-head-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.robot-body-slot {
+  width: 130px;
+  height: 90px;
+  border-radius: 28px;
+  background: #ffcf5a;
+  border: 4px solid #f5a623;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+  color: #7b4a00;
+}
+
+.robot-part-label {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1f4257;
+}
+
+.game-question-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.game-question-stage {
+  font-size: 20px;
+  font-weight: 800;
+  color: #f4a300;
+}
+
+.game-question-text {
+  font-size: clamp(1.4rem, 4vw, 2.4rem);
+  font-weight: 800;
+  color: #2d3748;
+  line-height: 1.35;
+}
+
+.game-input-panel {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.game-keypad {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.game-key-button,
+.game-confirm-button,
+.game-back-button {
+  border: none;
+  border-radius: 20px;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.game-key-button {
+  background: #ffffff;
+  color: #24506b;
+  box-shadow: 0 8px 16px rgba(36, 80, 107, 0.12);
+}
+
+.game-input-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.game-confirm-button {
+  min-height: 54px;
+  background: #53d769;
+  color: #ffffff;
+}
+
+.game-back-button {
+  min-height: 54px;
+  background: #ffffff;
+  color: #7a5600;
+  border: 3px solid #ffd166;
+}

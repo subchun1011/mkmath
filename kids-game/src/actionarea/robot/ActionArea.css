@@ -1,0 +1,173 @@
+.battle-field {
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 100%;
+  width: 100%;
+  padding: 12px 16px 20px;
+  border-radius: 24px;
+  background: linear-gradient(to bottom, #a2d2ff, #ffffff);
+  overflow: hidden;
+}
+
+/* 공격 시 앞으로 살짝 튀어나가는 연출 */
+.robot-character {
+  position: relative;
+  width: 140px;
+  height: 170px;
+}
+
+.battle-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.character-label {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  font-weight: 800;
+  color: #24506b;
+}
+
+.player.attacking {
+  animation: attack-right 0.5s ease-in-out;
+}
+.enemy.attacking {
+  animation: attack-left 0.5s ease-in-out;
+}
+.player.jump {
+  animation: robot-jump 0.6s ease;
+}
+
+@keyframes attack-right {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(50px) scale(1.1); }
+  100% { transform: translateX(0); }
+}
+
+/* 맞았을 때 뒤로 엉덩방아 찧는 듯한 흔들림 */
+.hurt-shake {
+  animation: hurt 0.4s ease-in-out;
+}
+
+@keyframes hurt {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg) translateX(-10px); }
+  75% { transform: rotate(10deg) translateX(10px); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes robot-jump {
+  0% { transform: translateY(0); }
+  35% { transform: translateY(-16px); }
+  70% { transform: translateY(2px); }
+  100% { transform: translateY(0); }
+}
+
+.robot-part {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: all 0.3s ease;
+}
+
+.robot-part img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.robot-part-head {
+  top: 0;
+  width: 68px;
+  height: 56px;
+}
+
+.robot-part-arms {
+  top: 50px;
+  width: 124px;
+  height: 42px;
+}
+
+.robot-part-body {
+  top: 48px;
+  width: 88px;
+  height: 78px;
+}
+
+.robot-part-legs {
+  bottom: 0;
+  width: 82px;
+  height: 58px;
+}
+
+.robot-part-wings {
+  top: 36px;
+  left: 50%;
+  width: 136px;
+  height: 52px;
+}
+
+.wings-badge {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(126, 214, 223, 0.5);
+  border: 2px dashed #48bfe3;
+  color: #0a5d75;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.enemy-core {
+  position: absolute;
+  inset: 24px 18px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 26px 26px 18px 18px;
+  background: linear-gradient(180deg, #ff8e72 0%, #ff5d5d 100%);
+  border: 4px solid #fff5f0;
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.praise-popup {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #fff6b0;
+  border: 3px solid #ffd166;
+  color: #7a5600;
+  font-size: 1rem;
+  font-weight: 900;
+  animation: praise-pop 1s ease;
+}
+
+@keyframes praise-pop {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px) scale(0.92);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-14px) scale(1.04);
+  }
+}
