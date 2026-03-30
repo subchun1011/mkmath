@@ -1,41 +1,40 @@
 // src/constants/battleShipSpriteData.js
-
 import battleShipImg from '../assets/images/battleShipImg.png'; 
 
 export const BATTLE_SHIP_SPRITE_DATA = {
   url: battleShipImg, 
-  size: 512, 
+  size: 1024, // 새 이미지 해상도에 맞춰 1024로 수정
   
-  // 1. 비행선 좌표 (이미지 상단 배치 분석) ⭐
+  // 1. 비행선 좌표 (1열: 파란색 유저 / 초록색 에일리언)
   ships: {
-    // [최종보정] y값을 142에서 75로 크게 올렸습니다. 
-    // 이제 비행선의 윗부분부터 제대로 보일 것입니다.
-    player: { x: 165, y: 75, w: 100, h: 90 }, 
-    enemy: { x: 265, y: 75, w: 100, h: 90 }, 
+    player: { x: 260, y: 100, w: 210, h: 180 }, 
+    enemy: { x: 550, y: 100, w: 210, h: 180 }, 
   },
   
-  // 2. 미사일 10종 좌표 (비행선 바로 아래 줄로 이동) ⭐
-  // y값을 235에서 185 지점으로 올렸습니다.
+  // 2. 미사일 10종 좌표 (2열: 물리 미사일 5종 / 3열: 에너지 레이저 5종)
+  // 모든 미사일이 이미 수평이므로 rotation은 0으로 설정합니다.
   missiles: [
-    { x: 102, y: 185, w: 32, h: 50, rotation: 90 }, // Level 1 (Up)
-    { x: 135, y: 185, w: 32, h: 50, rotation: 90 }, // Level 2
-    { x: 170, y: 185, w: 32, h: 50, rotation: 45 }, // Level 3
-    { x: 205, y: 185, w: 32, h: 50, rotation: 0 },  // Level 4
-    { x: 240, y: 185, w: 32, h: 50, rotation: 45 }, // Level 5
-    { x: 275, y: 185, w: 32, h: 50, rotation: 45 }, // Level 6
-    { x: 310, y: 185, w: 32, h: 50, rotation: 90 }, // Level 7
-    { x: 345, y: 185, w: 32, h: 50, rotation: 45 }, // Level 8
-    { x: 380, y: 185, w: 32, h: 50, rotation: 0 },  // Level 9
-    { x: 415, y: 185, w: 32, h: 50, rotation: 0 }   // Level 10
+    // --- 물리 미사일 Tier 1 ~ 5 ---
+    { x: 60,  y: 360, w: 110, h: 80,  rotation: 0 }, 
+    { x: 245, y: 360, w: 120, h: 90,  rotation: 0 }, 
+    { x: 430, y: 355, w: 135, h: 100, rotation: 0 }, 
+    { x: 615, y: 355, w: 140, h: 100, rotation: 0 }, 
+    { x: 795, y: 345, w: 205, h: 140, rotation: 0 }, 
+    
+    // --- 레이저 미사일 Tier 6 ~ 10 (가메하메하 스타일) ---
+    { x: 15,  y: 635, w: 180, h: 40,  rotation: 0 }, 
+    { x: 215, y: 620, w: 190, h: 80,  rotation: 0 }, 
+    { x: 420, y: 610, w: 160, h: 100, rotation: 0 }, 
+    { x: 600, y: 590, w: 160, h: 140, rotation: 0 }, 
+    { x: 780, y: 520, w: 240, h: 250, rotation: 0 }  // 왕왕 큰 레이저!
   ],
   
-  // 3. 피격 이펙트 5종 좌표 (미사일 아래 줄로 이동) 
-  // y값을 315에서 280 지점으로 올렸습니다.   asd
+  // 3. 피격 이펙트 5종 좌표 (4열)
   effects: [
-    { x: 125, y: 280, w: 60, h: 60 },
-    { x: 180, y: 280, w: 60, h: 60 },
-    { x: 235, y: 280, w: 60, h: 60 },
-    { x: 290, y: 280, w: 60, h: 60 },
-    { x: 345, y: 280, w: 60, h: 60 }
+    { x: 120, y: 830, w: 110, h: 120 },
+    { x: 265, y: 825, w: 140, h: 140 },
+    { x: 430, y: 800, w: 160, h: 180 },
+    { x: 605, y: 810, w: 160, h: 160 },
+    { x: 760, y: 810, w: 200, h: 180 }
   ]
 };

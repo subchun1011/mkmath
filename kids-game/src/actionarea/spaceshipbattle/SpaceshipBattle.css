@@ -3,16 +3,16 @@
 .space-battle {
   width: 100%;
   height: 100%;
-  /* 깊은 우주 느낌을 위한 다크 그라데이션 */
   background: radial-gradient(ellipse at bottom, #1B2735 0%, #000000 100%);
   position: relative;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  isolation: isolate; 
 }
 
-/* 배경에 반짝이는 별 효과 추가 */
+/* 배경 별 효과 */
 .space-battle::before {
   content: "";
   position: absolute;
@@ -24,6 +24,7 @@
   background-position: 0 0, 40px 60px;
   opacity: 0.2;
   animation: stars-twinkle 4s infinite linear;
+  z-index: 0;
 }
 
 @keyframes stars-twinkle {
@@ -38,110 +39,138 @@
   width: 100%;
   height: 100%;
   padding: 0 40px;
-  z-index: 1; /* 별보다 위로 오도록 */
+  z-index: 5;
 }
 
-/* 우주선 각각의 컨테이너 */
 .space-battle__ship {
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
-  width: 140px; 
-  height: 160px; /* 잘림 방지를 위해 높이를 살짝 더 확보 */
+  width: 120px; 
+  height: 140px; 
   justify-content: center;
 }
 
+/* HP 바 디자인 */
+.space-battle__hp-bar {
+  width: 100px;
+  height: 12px;
+  background: #333;
+  border: 1.5px solid #666;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  z-index: 10;
+}
+
+.space-battle__hp-fill {
+  height: 100%;
+  background-color: #ff4d4d; 
+  background: linear-gradient(90deg, #ff4d4d, #ff8080);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px rgba(255, 77, 77, 0.7);
+}
+
+/* ⭐ 우주선 스프라이트 래퍼 (흔들림 및 폭발의 기준점) ⭐ */
 .ship-sprite-wrapper {
+  position: relative; /* 폭발 레이어가 비행선 중앙에 붙도록 기준 설정 */
   transition: transform 0.1s;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 10px;
+  z-index: 6;
 }
 
-/* --- 애니메이션: 발사 반동 --- */
-
-.fire-recoil-p .ship-sprite-wrapper {
-  animation: recoil-p 0.3s ease;
-}
-
+/* --- 1. 애니메이션: 발사 반동 --- */
+.fire-recoil-p .ship-sprite-wrapper { animation: recoil-p 0.3s ease; }
 @keyframes recoil-p {
   0% { transform: translateX(0); }
   30% { transform: translateX(-15px); }
   100% { transform: translateX(0); }
 }
 
-.fire-recoil-e .ship-sprite-wrapper {
-  animation: recoil-e 0.3s ease;
-}
-
+.fire-recoil-e .ship-sprite-wrapper { animation: recoil-e 0.3s ease; }
 @keyframes recoil-e {
   0% { transform: translateX(0); }
   30% { transform: translateX(15px); }
   100% { transform: translateX(0); }
 }
 
-/* --- 애니메이션: 미사일 비행 --- */
+/* --- 2. 애니메이션: 피격 흔들림 (요구사항 1 반영) ⭐ --- */
+.hit-shake .ship-sprite-wrapper {
+  animation: hit-shake-anim 0.4s ease-in-out infinite;
+}
 
+@keyframes hit-shake-anim {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  20% { transform: translate(-8px, 5px) rotate(-2deg); }
+  40% { transform: translate(8px, -5px) rotate(2deg); }
+  60% { transform: translate(-5px, -8px) rotate(-1deg); }
+  80% { transform: translate(5px, 8px) rotate(1deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+/* --- 3. 폭발 레이어 스타일 (요구사항 2, 3 반영) ⭐ --- */
+.explosion-layer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* 비행선 정중앙에 정확히 겹침 */
+  z-index: 20;
+  pointer-events: none;
+  /* 비행선이 흔들릴 때 같이 흔들리도록 wrapper 내부의 자식으로 배치됨 */
+  animation: explosion-pop 0.4s ease-out forwards;
+}
+
+@keyframes explosion-pop {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* --- 애니메이션: 미사일 비행 --- */
 .space-battle__missile {
   position: absolute;
-  z-index: 5;
+  z-index: 15;
   pointer-events: none;
 }
 
-/* 플레이어 미사일: 비행선 중앙 높이(50%)에서 출발 */
 .animate-player {
   left: 25%;
-  top: 52%; /* 이미지에 맞춰 미세 조정 */
+  top: 50%;
   animation: missile-to-right 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes missile-to-right {
-  0% { left: 25%; opacity: 0; transform: scale(0.5); }
-  20% { opacity: 1; transform: scale(1.1); }
-  80% { left: 75%; opacity: 1; transform: scale(1); }
-  100% { left: 80%; opacity: 0; }
+  0% { left: 25%; opacity: 0; transform: translate(-50%, -50%) scale(0.3); } 
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+  80% { left: 75%; opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+  100% { left: 80%; opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
 }
 
-/* 적 미사일: 비행선 중앙 높이(50%)에서 출발 */
 .animate-enemy {
   right: 25%;
-  top: 52%; /* 이미지에 맞춰 미세 조정 */
+  top: 50%;
   animation: missile-to-left 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes missile-to-left {
-  0% { right: 25%; opacity: 0; transform: scale(0.5); }
-  20% { opacity: 1; transform: scale(1.1); }
-  80% { right: 75%; opacity: 1; transform: scale(1); }
-  100% { right: 80%; opacity: 0; }
+  0% { right: 25%; opacity: 0; transform: translate(50%, -50%) scale(0.3); } 
+  20% { opacity: 1; transform: translate(50%, -50%) scale(0.5); }
+  80% { right: 75%; opacity: 1; transform: translate(50%, -50%) scale(0.5); }
+  100% { right: 80%; opacity: 0; transform: translate(50%, -50%) scale(0.5); }
 }
 
-/* --- UI 요소 --- */
-
+/* UI 요소 */
 .vs-logo {
   font-size: 1.8rem;
   font-weight: bold;
   color: #ffde59;
   text-shadow: 0 0 10px rgba(255, 222, 89, 0.8);
   font-family: 'Arial Black', sans-serif;
-  z-index: 2;
-}
-
-.space-battle__hp-bar {
-  width: 70px;
-  height: 6px;
-  background: #333;
-  border: 1px solid #555;
-  border-radius: 5px;
-  margin-bottom: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 5px rgba(0,0,0,0.5);
-}
-
-.space-battle__hp-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #ff4d4d, #ff8080);
-  transition: width 0.4s ease-out;
+  z-index: 5;
 }
