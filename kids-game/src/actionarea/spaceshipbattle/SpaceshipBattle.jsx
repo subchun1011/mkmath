@@ -1,7 +1,7 @@
 // src/actionarea/spaceshipbattle/SpaceshipBattle.jsx
 import React from 'react';
 import './SpaceshipBattle.css';
-import BattleShipSprite from '../../components/common/BattleShipSprite'; 
+import BattleShipSprite from '../../components/common/battleShipSprite'; 
 
 const SpaceshipBattle = ({ playerHP, enemyHP, actionState, missileTier = 1 }) => {
   const MAX_HP = 100; 
