@@ -18,20 +18,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
-          cache-dependency-path: './kids-game/package-lock.json'
+          # 캐시 설정은 에러 방지를 위해 일단 제외하거나 유연하게 설정합니다.
+
       - name: Install dependencies
         run: npm install
+
       - name: Build
-        run: npm run build
+        # CI=false를 붙여서 단순 경고 때문에 빌드가 멈추는 것을 방지합니다. ⭐
+        run: CI=false npm run build 
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./kids-game/dist # 빌드된 결과물이 있는 폴더
+          # 빌드 결과물이 생성되는 폴더 (Vite 기본값은 dist입니다)
+          path: ./kids-game/dist 
 
   deploy:
     needs: build
