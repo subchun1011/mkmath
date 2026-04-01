@@ -12,7 +12,7 @@
   isolation: isolate; 
 }
 
-/* 배경 별 효과 */
+/* 배경 별 효과 (생략 가능 - 기존과 동일) */
 .space-battle::before {
   content: "";
   position: absolute;
@@ -35,31 +35,34 @@
 .space-battle__ships {
   display: flex;
   justify-content: space-around;
-  align-items: center;
+  /* ⭐ 중요: 아이템들을 하단 정렬로 변경하여 HP 바 공간 확보 */
+  align-items: flex-end; 
   width: 100%;
   height: 100%;
-  padding: 0 40px;
+  padding: 0 20px 20px 20px; /* 하단 여백 추가 */
   z-index: 5;
 }
 
+/* 우주선 컨테이너 수정 ⭐ */
 .space-battle__ship {
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
   width: 120px; 
-  height: 140px; 
-  justify-content: center;
+  /* ⭐ 고정 높이(140px)를 제거하고 auto로 변경 */
+  height: auto; 
+  justify-content: flex-end;
 }
 
-/* HP 바 디자인 */
+/* HP 바 디자인 ⭐ */
 .space-battle__hp-bar {
-  width: 100px;
-  height: 12px;
+  width: 80px;          /* 폭을 살짝 줄여서 모바일에 최적화 */
+  height: 10px;         /* 높이 살짝 조절 */
   background: #333;
   border: 1.5px solid #666;
-  border-radius: 6px;
-  margin-bottom: 10px;
+  border-radius: 5px;
+  margin-bottom: 8px;   /* 우주선과의 간격 */
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
@@ -69,23 +72,26 @@
 
 .space-battle__hp-fill {
   height: 100%;
-  background-color: #ff4d4d; 
   background: linear-gradient(90deg, #ff4d4d, #ff8080);
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 0 8px rgba(255, 77, 77, 0.7);
 }
 
-/* ⭐ 우주선 스프라이트 래퍼 (흔들림 및 폭발의 기준점) ⭐ */
+/* 우주선 스프라이트 래퍼 ⭐ */
 .ship-sprite-wrapper {
-  position: relative; /* 폭발 레이어가 비행선 중앙에 붙도록 기준 설정 */
+  position: relative;
   transition: transform 0.1s;
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 6;
+  /* ⭐ 화면 높이가 낮을 경우 우주선 크기를 자동으로 조절 */
+  max-height: 80px; 
 }
 
-/* --- 1. 애니메이션: 발사 반동 --- */
+/* 기존 애니메이션들 (recoil, shake, explosion, missile)은 그대로 유지 */
+/* ... (이하 동일) ... */
+
 .fire-recoil-p .ship-sprite-wrapper { animation: recoil-p 0.3s ease; }
 @keyframes recoil-p {
   0% { transform: translateX(0); }
@@ -100,7 +106,6 @@
   100% { transform: translateX(0); }
 }
 
-/* --- 2. 애니메이션: 피격 흔들림 (요구사항 1 반영) ⭐ --- */
 .hit-shake .ship-sprite-wrapper {
   animation: hit-shake-anim 0.4s ease-in-out infinite;
 }
@@ -114,15 +119,13 @@
   100% { transform: translate(0, 0) rotate(0deg); }
 }
 
-/* --- 3. 폭발 레이어 스타일 (요구사항 2, 3 반영) ⭐ --- */
 .explosion-layer {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* 비행선 정중앙에 정확히 겹침 */
+  transform: translate(-50%, -50%);
   z-index: 20;
   pointer-events: none;
-  /* 비행선이 흔들릴 때 같이 흔들리도록 wrapper 내부의 자식으로 배치됨 */
   animation: explosion-pop 0.4s ease-out forwards;
 }
 
@@ -132,7 +135,6 @@
   100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
 }
 
-/* --- 애니메이션: 미사일 비행 --- */
 .space-battle__missile {
   position: absolute;
   z-index: 15;
@@ -165,9 +167,8 @@
   100% { right: 80%; opacity: 0; transform: translate(50%, -50%) scale(0.5); }
 }
 
-/* UI 요소 */
 .vs-logo {
-  font-size: 1.8rem;
+  font-size: 1.5rem; /* VS 로고 크기 살짝 축소 */
   font-weight: bold;
   color: #ffde59;
   text-shadow: 0 0 10px rgba(255, 222, 89, 0.8);
