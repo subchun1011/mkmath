@@ -1,16 +1,45 @@
+/* 1. 최상단에 Safe Area(노치 디자인 대응) 변수 선언 */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* 2. 전체 박스 사이징 설정 (기존 소스 유지 + 터치 최적화) */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  /* 모바일에서 버튼 클릭 시 생기는 파란색 하이라이트 제거 */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 3. HTML, Body, Root 레이아웃 머지 */
 html,
 body,
 #root {
-  margin: 0;
   width: 100%;
-  min-height: 100%;
+  /* 핵심: min-height: 100% 대신 100dvh를 사용하여 브라우저 바 문제를 해결합니다. */
+  height: 100dvh; 
+  margin: 0;
+  overflow: hidden; /* 게임 화면이므로 원치 않는 스크롤 방지 */
 }
 
+/* 4. Body 스타일 머지 (폰트 및 배경색 적용) */
 body {
   font-family: 'Trebuchet MS', 'Noto Sans KR', sans-serif;
-  background: #5c94fc;
+  /* 기존 배경색 유지 */
+  background: #5c94fc; 
+  /* 앱 느낌을 위해 텍스트 드래그 및 롱탭 메뉴 방지 */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  
+  /* 노치 영역 안으로 콘텐츠가 들어가지 않도록 여백 설정 (선택 사항) */
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
 }
 
-* {
-  box-sizing: border-box;
+/* 5. 추가 팁: 이미지 드래그 방지 (우주선 조작 시 방해 금지) */
+img {
+  -webkit-user-drag: none;
 }
