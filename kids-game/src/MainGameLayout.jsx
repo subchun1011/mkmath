@@ -45,6 +45,47 @@ const styles = {
     alignItems: 'stretch',
     paddingBottom: 'max(12px, var(--safe-bottom))',
   },
+  /* --- 세로셈 전용 스타일 추가 --- */
+  verticalMathStack: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end', // 오른쪽 자릿수 맞춤 핵심
+    fontFamily: '"Courier New", Courier, monospace', // 숫자 폭 일정하게
+  },
+  mathNumber: {
+    fontSize: 'clamp(2.5rem, 8vh, 4rem)',
+    fontWeight: 800,
+    color: '#2d3748',
+    letterSpacing: '4px',
+    lineHeight: 1.1,
+  },
+  operatorRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    width: '100%',
+  },
+  operatorSymbol: {
+    fontSize: 'clamp(1.5rem, 5vh, 2.5rem)',
+    fontWeight: 700,
+    color: '#ff7675',
+    marginRight: '15px',
+  },
+  mathLine: {
+    width: '110%',
+    height: '4px',
+    backgroundColor: '#333',
+    margin: '8px 0',
+    borderRadius: '2px',
+  },
+  answerText: {
+    fontSize: 'clamp(2.5rem, 8vh, 4rem)',
+    fontWeight: 800,
+    color: '#3182ce', // 입력값은 파란색으로 강조
+    minHeight: '1.2em',
+    letterSpacing: '4px',
+  },
+  /* --- 기존 카드 스타일 유지/보완 --- */
   timerBarTrack: {
     width: '100%',
     height: '12px',
@@ -60,47 +101,21 @@ const styles = {
     transition: 'width 0.3s ease',
   },
   actionCard: {
-    width: '100%',
-    height: '100%',
-    borderRadius: '20px',
-    border: '3px solid #7cc7f6',
-    backgroundColor: 'rgba(255, 255, 255, 0.72)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 'clamp(1rem, 3.5vw, 2rem)',
-    fontWeight: 700,
-    color: '#24506b',
-    textAlign: 'center',
+    width: '100%', height: '100%', borderRadius: '20px', border: '3px solid #7cc7f6',
+    backgroundColor: 'rgba(255, 255, 255, 0.72)', display: 'flex', alignItems: 'center',
+    justifyContent: 'center', fontSize: 'clamp(1rem, 3.5vw, 2rem)', fontWeight: 700,
+    color: '#24506b', textAlign: 'center',
   },
   questionCard: {
-    width: '100%',
-    height: '100%',
-    borderRadius: '24px',
-    border: '4px solid #ffd166',
-    backgroundColor: '#fffdf5',
-    display: 'flex',
-    alignItems: 'center',
+    width: '100%', height: '100%', borderRadius: '24px', border: '4px solid #ffd166',
+    backgroundColor: '#fffdf5', display: 'flex', alignItems: 'center',
     justifyContent: 'center',
-    fontSize: 'clamp(1.5rem, 4.5vw, 2.5rem)',
-    fontWeight: 800,
-    color: '#2d3748',
-    textAlign: 'center',
-    lineHeight: 1.2,
   },
   inputCard: {
-    width: '100%',
-    height: '100%',
-    borderRadius: '24px',
-    border: '3px dashed #f0b429',
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 'clamp(1rem, 3vw, 1.8rem)',
-    fontWeight: 700,
-    color: '#7a5600',
-    textAlign: 'center',
+    width: '100%', height: '100%', borderRadius: '24px', border: '3px dashed #f0b429',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)', display: 'flex', alignItems: 'center',
+    justifyContent: 'center', fontSize: 'clamp(1rem, 3vw, 1.8rem)', fontWeight: 700,
+    color: '#7a5600', textAlign: 'center',
   },
 };
 
@@ -113,40 +128,53 @@ export default function MainGameLayout({
   actionContent,
   questionContent,
   inputContent,
+  // 세로셈용 데이터 추가 (부모로부터 받음)
+  num1 = 0,
+  num2 = 0,
+  operator = '+',
+  userInput = ''
 }) {
   return (
     <main style={styles.screen}>
       {/* 1. 타이머 영역 (5%) */}
       <section style={{ ...styles.sectionBase, ...styles.timerArea }}>
-        {renderContent(
-          timerContent,
+        {renderContent(timerContent,
           <div style={styles.timerBarTrack} aria-label="남은 시간">
             <div style={styles.timerBarFill} />
-          </div>,
+          </div>
         )}
       </section>
 
       {/* 2. 액션(우주선) 영역 (30%) */}
       <section style={{ ...styles.sectionBase, ...styles.actionArea }}>
-        {renderContent(
-          actionContent,
-          <div style={styles.actionCard}>로봇 또는 자동차 액션 영역</div>,
+        {renderContent(actionContent,
+          <div style={styles.actionCard}>로봇 또는 자동차 액션 영역</div>
         )}
       </section>
 
-      {/* 3. 문제 영역 (30%) */}
+      {/* 3. 문제 영역 (30%) - 세로셈 적용 */}
       <section style={{ ...styles.sectionBase, ...styles.questionArea }}>
-        {renderContent(
-          questionContent,
-          <div style={styles.questionCard}>문제가 여기에 표시돼요</div>,
+        {renderContent(questionContent,
+          <div style={styles.questionCard}>
+            <div style={styles.verticalMathStack}>
+              <div style={styles.mathNumber}>{num1}</div>
+              <div style={styles.operatorRow}>
+                <span style={styles.operatorSymbol}>{operator}</span>
+                <span style={styles.mathNumber}>{num2}</span>
+              </div>
+              <div style={styles.mathLine} />
+              <div style={styles.answerText}>
+                {userInput}
+              </div>
+            </div>
+          </div>
         )}
       </section>
 
       {/* 4. 입력(키패드) 영역 (35%) */}
       <section style={{ ...styles.sectionBase, ...styles.inputArea }}>
-        {renderContent(
-          inputContent,
-          <div style={styles.inputCard}>정답 입력 패드와 확인 버튼 영역</div>,
+        {renderContent(inputContent,
+          <div style={styles.inputCard}>정답 입력 패드 영역</div>
         )}
       </section>
     </main>

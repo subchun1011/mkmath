@@ -1,0 +1,55 @@
+/* src/actionarea/VerticalMath.css */
+
+.vertical-math-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* 오른쪽 정렬로 자릿수 맞춤 */
+  font-family: 'Courier New', Courier, monospace; /* 숫자 폭이 일정한 폰트 권장 */
+  font-size: 4rem; /* 크고 시원하게 */
+  font-weight: bold;
+  color: #333;
+  position: relative;
+  padding: 20px;
+}
+
+.math-num {
+  letter-spacing: 10px; /* 숫자 간격 */
+  line-height: 1.2;
+}
+
+.math-operator-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.math-operator {
+  margin-right: 20px;
+  color: #ff5e5e;
+}
+
+.math-line {
+  width: 120%; /* 숫자보다 조금 더 넓게 */
+  height: 4px;
+  background-color: #333;
+  margin: 10px 0;
+  border-radius: 2px;
+}
+
+/* 정답 입력칸: 일의 자리부터 채워지는 느낌 */
+.math-answer-display {
+  color: #2d87ff;
+  letter-spacing: 10px;
+  min-height: 1.2em;
+  text-align: right;
+}
+
+.cursor-blink {
+  border-right: 3px solid #2d87ff;
+  animation: blink 0.8s infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}

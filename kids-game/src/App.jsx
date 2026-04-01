@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import StageGameScreen from './StageGameScreen';
-import SelectionScreen from './SelectionScreen'; // 새로 만든 선택 화면
+import SelectionScreen from './SelectionScreen';
 
 function App() {
   useEffect(() => {
+    // 1. 모바일 브라우저 주소창 문제를 해결하기 위한 높이 계산
     const updateAppViewport = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
       document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
     };
 
@@ -18,13 +21,12 @@ function App() {
     };
   }, []);
 
-  // 1. 게임 전역 상태 관리
-  const [view, setView] = useState('selection'); // 'selection' 또는 'game'
-  const [gameConfig, setGameConfig] = useState(null); // { category, subCategory, level }
+  // 전역 상태 관리
+  const [view, setView] = useState('selection'); 
+  const [gameConfig, setGameConfig] = useState(null); 
   const [coins, setCoins] = useState(0); 
   const [currentMissileTier, setCurrentMissileTier] = useState(1); 
 
-  // 2. 코인 및 업그레이드 로직
   const earnCoins = (amount) => setCoins(prev => prev + amount);
   
   const upgradeMissile = (cost) => {
@@ -36,7 +38,6 @@ function App() {
     return false;
   };
 
-  // 3. 화면 전환 함수
   const handleStartGame = (config) => {
     setGameConfig(config);
     setView('game');
@@ -48,12 +49,17 @@ function App() {
   };
 
   return (
-    <div className="App">
+    /* 2. 전역 스타일 적용: 스크롤 방지 및 꽉 찬 화면 */
+    <div className="App" style={{ 
+      width: '100%', 
+      height: 'var(--app-height, 100dvh)', 
+      overflow: 'hidden',
+      position: 'fixed', // 화면 출렁임 방지
+      top: 0, left: 0 
+    }}>
       {view === 'selection' ? (
-        /* --- [선택 화면] --- */
         <SelectionScreen onStartGame={handleStartGame} />
       ) : (
-        /* --- [게임 화면] --- */
         <StageGameScreen 
           category={gameConfig.category}
           subCategory={gameConfig.subCategory}
@@ -62,7 +68,7 @@ function App() {
           onEarnCoin={() => earnCoins(10)} 
           missileTier={currentMissileTier}
           onUpgrade={upgradeMissile}
-          onBack={handleBackToMenu} // 백버튼 클릭 시 메뉴로 이동
+          onBack={handleBackToMenu}
         />
       )}
     </div>
