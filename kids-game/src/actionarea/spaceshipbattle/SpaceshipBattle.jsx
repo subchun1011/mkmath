@@ -28,7 +28,7 @@ const SpaceshipBattle = ({ playerHP, enemyHP, actionState, missileTier = 1 }) =>
           </div>
           
           <div className="ship-sprite-wrapper">
-            <BattleShipSprite type="player" scale={0.4} />
+            <BattleShipSprite type="player" scale={0.2} />
             
             {/* 💥 플레이어 피격 시 폭발 레이어 (요구사항 2 반영) */}
             {actionState === 'enemyFire' && (
@@ -51,7 +51,7 @@ const SpaceshipBattle = ({ playerHP, enemyHP, actionState, missileTier = 1 }) =>
           </div>
           
           <div className="ship-sprite-wrapper">
-            <BattleShipSprite type="enemy" scale={0.4} />
+            <BattleShipSprite type="enemy" scale={0.2} />
             
             {/* 💥 적 피격 시 폭발 레이어 (요구사항 2, 3 반영) */}
             {actionState === 'playerFire' && (
