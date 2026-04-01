@@ -45,18 +45,19 @@ const styles = {
     alignItems: 'stretch',
     paddingBottom: 'max(12px, var(--safe-bottom))',
   },
-  /* --- 세로셈 전용 스타일 추가 --- */
+  /* --- 세로셈 전용 스타일 (폰트 사이즈 하향 조정) --- */
   verticalMathStack: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'flex-end', // 오른쪽 자릿수 맞춤 핵심
-    fontFamily: '"Courier New", Courier, monospace', // 숫자 폭 일정하게
+    alignItems: 'flex-end',
+    fontFamily: '"Courier New", Courier, monospace',
   },
   mathNumber: {
-    fontSize: 'clamp(2.5rem, 8vh, 4rem)',
+    // 기존 8vh -> 5.5vh로 축소, 최대 크기도 4rem -> 2.8rem으로 축소
+    fontSize: 'clamp(1.8rem, 5.5vh, 2.8rem)', 
     fontWeight: 800,
     color: '#2d3748',
-    letterSpacing: '4px',
+    letterSpacing: '6px', // 숫자 간격 살짝 조정
     lineHeight: 1.1,
   },
   operatorRow: {
@@ -66,26 +67,28 @@ const styles = {
     width: '100%',
   },
   operatorSymbol: {
-    fontSize: 'clamp(1.5rem, 5vh, 2.5rem)',
+    // 연산자 기호도 비율에 맞춰 축소
+    fontSize: 'clamp(1.2rem, 4vh, 1.8rem)', 
     fontWeight: 700,
     color: '#ff7675',
-    marginRight: '15px',
+    marginRight: '12px',
   },
   mathLine: {
-    width: '110%',
-    height: '4px',
+    width: '115%',
+    height: '3px', // 선 두께 살짝 얇게
     backgroundColor: '#333',
-    margin: '8px 0',
+    margin: '6px 0', // 여백 축소
     borderRadius: '2px',
   },
   answerText: {
-    fontSize: 'clamp(2.5rem, 8vh, 4rem)',
+    // 입력값 폰트도 문제 폰트와 동일하게 축소
+    fontSize: 'clamp(1.8rem, 5.5vh, 2.8rem)', 
     fontWeight: 800,
-    color: '#3182ce', // 입력값은 파란색으로 강조
+    color: '#3182ce',
     minHeight: '1.2em',
-    letterSpacing: '4px',
+    letterSpacing: '6px',
   },
-  /* --- 기존 카드 스타일 유지/보완 --- */
+  /* --- 기존 카드 스타일 유지 --- */
   timerBarTrack: {
     width: '100%',
     height: '12px',
@@ -128,7 +131,6 @@ export default function MainGameLayout({
   actionContent,
   questionContent,
   inputContent,
-  // 세로셈용 데이터 추가 (부모로부터 받음)
   num1 = 0,
   num2 = 0,
   operator = '+',
@@ -136,7 +138,7 @@ export default function MainGameLayout({
 }) {
   return (
     <main style={styles.screen}>
-      {/* 1. 타이머 영역 (5%) */}
+      {/* 1. 타이머 영역 */}
       <section style={{ ...styles.sectionBase, ...styles.timerArea }}>
         {renderContent(timerContent,
           <div style={styles.timerBarTrack} aria-label="남은 시간">
@@ -145,14 +147,14 @@ export default function MainGameLayout({
         )}
       </section>
 
-      {/* 2. 액션(우주선) 영역 (30%) */}
+      {/* 2. 액션 영역 */}
       <section style={{ ...styles.sectionBase, ...styles.actionArea }}>
         {renderContent(actionContent,
           <div style={styles.actionCard}>로봇 또는 자동차 액션 영역</div>
         )}
       </section>
 
-      {/* 3. 문제 영역 (30%) - 세로셈 적용 */}
+      {/* 3. 문제 영역 - 세로셈 최적화 적용 */}
       <section style={{ ...styles.sectionBase, ...styles.questionArea }}>
         {renderContent(questionContent,
           <div style={styles.questionCard}>
@@ -171,7 +173,7 @@ export default function MainGameLayout({
         )}
       </section>
 
-      {/* 4. 입력(키패드) 영역 (35%) */}
+      {/* 4. 입력 영역 */}
       <section style={{ ...styles.sectionBase, ...styles.inputArea }}>
         {renderContent(inputContent,
           <div style={styles.inputCard}>정답 입력 패드 영역</div>
