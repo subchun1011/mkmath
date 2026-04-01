@@ -1,15 +1,16 @@
 .question-container {
   width: 100%;
   height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background-color: #ffffff;
   position: relative;
-  border-radius: 28px;
-  padding: 24px 20px;
-  border: 4px solid #ffd166;
+  border-radius: clamp(18px, 3vw, 28px);
+  padding: clamp(16px, 2.4vw, 24px);
+  border: 3px solid #ffd166;
   box-sizing: border-box;
   overflow: hidden;
   transition: opacity 0.28s ease, transform 0.28s ease;
@@ -17,21 +18,22 @@
 
 .category-badge {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: clamp(10px, 1.6vh, 14px);
+  left: clamp(10px, 1.6vh, 14px);
   background: #ffce00;
   padding: 4px 12px;
-  border-radius: 15px;
-  font-size: 12px;
+  border-radius: 999px;
+  font-size: clamp(0.72rem, 2vw, 0.82rem);
   font-weight: bold;
 }
 
 .question-text {
-  font-size: clamp(2rem, 6vw, 4rem);
+  font-size: clamp(1.8rem, 6vw, 4rem);
   font-weight: 900;
   color: #333;
   text-align: center;
   word-break: keep-all;
+  line-height: 1.1;
 }
 
 /* 카테고리별 특수 스타일링 */
@@ -45,10 +47,11 @@
 }
 
 .hint-text {
-  margin-top: 15px;
-  font-size: 16px;
+  margin-top: clamp(10px, 1.8vh, 15px);
+  font-size: clamp(0.9rem, 2.8vw, 1rem);
   color: #888;
   animation: bounce 2s infinite;
+  text-align: center;
 }
 
 .question-fade-in {
@@ -72,6 +75,16 @@
   font-size: 1.2rem;
   font-weight: 700;
   color: #7a5600;
+}
+
+@media (max-height: 760px) {
+  .question-text {
+    font-size: clamp(1.55rem, 5.4vw, 3rem);
+  }
+
+  .hint-text {
+    margin-top: 8px;
+  }
 }
 
 @keyframes bounce {

@@ -1,8 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import StageGameScreen from './StageGameScreen';
 import SelectionScreen from './SelectionScreen'; // 새로 만든 선택 화면
 
 function App() {
+  useEffect(() => {
+    const updateAppViewport = () => {
+      document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+    };
+
+    updateAppViewport();
+    window.addEventListener('resize', updateAppViewport);
+    window.addEventListener('orientationchange', updateAppViewport);
+
+    return () => {
+      window.removeEventListener('resize', updateAppViewport);
+      window.removeEventListener('orientationchange', updateAppViewport);
+    };
+  }, []);
+
   // 1. 게임 전역 상태 관리
   const [view, setView] = useState('selection'); // 'selection' 또는 'game'
   const [gameConfig, setGameConfig] = useState(null); // { category, subCategory, level }
@@ -33,7 +48,7 @@ function App() {
   };
 
   return (
-    <div className="App" style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
+    <div className="App">
       {view === 'selection' ? (
         /* --- [선택 화면] --- */
         <SelectionScreen onStartGame={handleStartGame} />

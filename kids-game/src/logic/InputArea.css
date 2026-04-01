@@ -1,20 +1,23 @@
 .input-area-container {
   width: 100%;
   height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: clamp(8px, 1.4vh, 14px);
 }
 
 .input-display {
-  min-height: 64px;
-  border-radius: 22px;
-  border: 4px solid #ffd166;
+  flex: 0 0 auto;
+  min-height: clamp(52px, 7.4vh, 72px);
+  border-radius: clamp(16px, 2.6vw, 22px);
+  border: 3px solid #ffd166;
   background: rgba(255, 255, 255, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  padding: 8px 12px;
+  font-size: clamp(1.6rem, 5.2vw, 2.8rem);
   font-weight: 900;
   color: #24506b;
 }
@@ -25,18 +28,21 @@
 
 .keypad {
   flex: 1;
+  min-height: 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  grid-auto-rows: minmax(0, 1fr);
+  gap: clamp(8px, 1.4vh, 12px);
 }
 
 .keypad button {
-  min-height: 54px;
+  min-height: 0;
+  height: 100%;
   border: none;
-  border-radius: 20px;
+  border-radius: clamp(16px, 2.6vw, 20px);
   background: #ffffff;
   color: #24506b;
-  font-size: 1.15rem;
+  font-size: clamp(1rem, 4.4vw, 1.35rem);
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 8px 16px rgba(36, 80, 107, 0.12);
@@ -71,5 +77,15 @@
   }
   80% {
     transform: translateX(4px);
+  }
+}
+
+@media (max-height: 760px) {
+  .input-area-container {
+    gap: 8px;
+  }
+
+  .keypad button {
+    border-radius: 14px;
   }
 }

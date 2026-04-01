@@ -2,39 +2,38 @@ import React from 'react';
 
 const styles = {
   screen: {
-    /* 1. 실제 보이는 화면 높이에 딱 맞춤 (iOS 주소창 대응) */
     width: '100%',
-    height: '100dvh', 
+    height: 'var(--app-height, 100dvh)',
+    minHeight: '100svh',
+    maxHeight: 'var(--app-height, 100dvh)',
     display: 'grid',
-    /* 5% 30% 30% 35% 비율 유지 */
-    gridTemplateRows: '5% 30% 30% 35%',
+    gridTemplateRows: '5fr 30fr 30fr 35fr',
     background: 'linear-gradient(180deg, #f7fbff 0%, #fff5d9 100%)',
     overflow: 'hidden',
-    
-    /* 2. 노치 디자인 및 하단 바 영역 보호 (App.css의 변수 활용) */
     paddingTop: 'var(--safe-top, 0px)',
     paddingBottom: 'var(--safe-bottom, 0px)',
-    
-    /* 3. 앱처럼 보이게 하는 UX 설정 */
-    userSelect: 'none',           /* 텍스트 선택 방지 */
+    paddingLeft: 'var(--safe-left, 0px)',
+    paddingRight: 'var(--safe-right, 0px)',
+    boxSizing: 'border-box',
+    userSelect: 'none',
     WebkitUserSelect: 'none',
-    WebkitTouchCallout: 'none',   /* 롱탭 메뉴 방지 */
-    touchAction: 'manipulation',  /* 더블탭 확대 방지 */
+    WebkitTouchCallout: 'none',
+    touchAction: 'manipulation',
   },
   sectionBase: {
     minHeight: 0,
+    minWidth: 0,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     boxSizing: 'border-box',
-    padding: '2vw', /* 내부 여백 살짝 조절 */
+    padding: 'clamp(8px, 1.6vh, 16px) clamp(10px, 2.4vw, 18px)',
   },
   timerArea: {
     backgroundColor: '#fff8df',
-    padding: '0.5vh 2.5vw',
+    padding: 'clamp(6px, 0.8vh, 10px) clamp(10px, 2.4vw, 18px)',
   },
   actionArea: {
-    /* 배경은 하위 컴포넌트(우주선)에서 그려지므로 여기선 레이아웃만 유지 */
     background: 'linear-gradient(180deg, #dff4ff 0%, #c8ecff 100%)',
     position: 'relative',
   },
@@ -44,8 +43,7 @@ const styles = {
   inputArea: {
     background: 'linear-gradient(180deg, #fff4cc 0%, #ffe7a3 100%)',
     alignItems: 'stretch',
-    /* 키패드가 너무 바닥에 붙지 않도록 하단 여백 확보 */
-    paddingBottom: 'max(10px, var(--safe-bottom))', 
+    paddingBottom: 'max(12px, var(--safe-bottom))',
   },
   timerBarTrack: {
     width: '100%',
