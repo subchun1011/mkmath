@@ -1,19 +1,38 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import MainGameLayout from './MainGameLayout.jsx';
 import { useSpaceBattleLogic } from './hooks/useSpaceBattleLogic'; 
+import { useCoins } from './coins/CoinContext'; // ⭐ 전역 코인 컨텍스트 임포트
 import SpaceshipBattle from './actionarea/spaceshipbattle/SpaceshipBattle'; 
 import InputArea from './logic/InputArea'; 
 import { getQuestion } from './logic/QuestionFactory'; 
 import './StageGameScreen.css';
 
+/**
+ * 어떤 데이터 구조에서도 숫자를 정확히 뽑아내는 헬퍼 함수
+ */
+const getNumbersFromQuestion = (q) => {
+  if (!q) return [0, 0];
+  if (q.num1 !== undefined && q.num2 !== undefined) {
+    return [Number(q.num1), Number(q.num2)];
+  }
+  const sourceText = q.text || q.question || q.q || "";
+  const matches = sourceText.match(/\d+/g);
+  if (matches && matches.length >= 2) {
+    return [Number(matches[0]), Number(matches[1])];
+  }
+  return [0, 0];
+};
+
 const StageGameScreen = ({ category, subCategory, level, onBack }) => {
+  // ⭐ 전역 코인 상태 및 기능
+  const { coins, earnCoins, loseCoins } = useCoins();
+
+  // 배틀 로직 커스텀 훅 (coins는 전역을 사용하므로 여기서 제외 가능)
   const { 
     playerHP, 
     enemyHP, 
     actionState, 
-    coins, 
     isWin, 
-    isLose, 
     isGameOver, 
     processCorrect, 
     processWrong,
@@ -24,100 +43,88 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
   const [userInput, setUserInput] = useState(''); 
   const timerRef = useRef(null);
 
-  const titleText = category === 'math'
-    ? `${(subCategory || 'math').toUpperCase()} - LV.${level}`
-    : `${(category || 'game').toUpperCase()} - LV.${level}`;
-
-  // ⭐ 어떤 속성명으로 데이터가 오든 숫자를 추출하는 무적 파서
-  const getNumbersFromQuestion = (q) => {
-    if (!q) return [0, 0];
-    
-    // 1. 이미 num1, num2가 객체 안에 숫자로 존재할 경우
-    if (q.num1 !== undefined && q.num2 !== undefined) {
-      return [Number(q.num1), Number(q.num2)];
-    }
-
-    // 2. text, question, q 등 문자열 속성에서 숫자를 추출
-    const sourceText = q.text || q.question || q.q || "";
-    const matches = sourceText.match(/\d+/g);
-    
-    if (matches && matches.length >= 2) {
-      return [Number(matches[0]), Number(matches[1])];
-    }
-
-    // 3. 최후의 수단 (데이터 확인용 로그)
-    console.warn("데이터 구조 확인 필요:", q);
-    return [0, 0];
-  };
-
-  const nextQuestion = () => {
+  const nextQuestion = useCallback(() => {
     const newQ = getQuestion(category, level, subCategory);
     setCurrentQuestion(newQ);
     setUserInput(''); 
-  };
+  }, [category, level, subCategory]);
 
   useEffect(() => {
     nextQuestion(); 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [category, level, subCategory]);
+  }, [nextQuestion]);
 
-  const handleInput = (num) => {
+  const titleText = useMemo(() => {
+    const label = category === 'math' ? (subCategory || 'math') : (category || 'game');
+    return `${label.toUpperCase()} - LV.${level}`;
+  }, [category, subCategory, level]);
+
+  const handleInput = useCallback((num) => {
     if (isGameOver) return;
     setUserInput(prev => {
       const next = num + prev; 
-      if (next.length > 4) return prev; 
-      return next;
+      return next.length > 4 ? prev : next; 
     });
-  };
+  }, [isGameOver]);
 
-  const handleBackspace = () => {
+  const handleBackspace = useCallback(() => {
+    if (isGameOver) return;
     setUserInput(prev => prev.slice(1)); 
-  };
+  }, [isGameOver]);
 
-  const handleCorrect = () => {
+  // ⭐ 정답 시: 공격 로직 실행 + 10코인 획득
+  const handleCorrect = useCallback(() => {
     if (isGameOver) return;
     processCorrect(); 
+    earnCoins(10); 
+    
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
       if (enemyHP > 0) nextQuestion(); 
     }, 600);
-  };
+  }, [isGameOver, processCorrect, earnCoins, enemyHP, nextQuestion]);
 
-  const handleWrong = () => {
+  // ⭐ 오답 시: 피격 로직 실행 + 10코인 차감
+  const handleWrong = useCallback(() => {
     if (isGameOver) return;
     processWrong();
+    loseCoins(10); 
     setUserInput(''); 
-  };
+  }, [isGameOver, processWrong, loseCoins]);
 
-  const handleRetry = () => {
+  const handleRetry = useCallback(() => {
     resetBattle();
     nextQuestion();
-  };
+  }, [resetBattle, nextQuestion]);
 
-  if (!currentQuestion) return <div style={{ color: '#fff', textAlign: 'center', marginTop: '50px' }}>Loading...</div>;
+  if (!currentQuestion) {
+    return <div className="stage-game-screen__loading">Loading...</div>;
+  }
 
-  // ⭐ 렌더링 직전에 문제에서 숫자를 확실히 뽑아냅니다.
   const [num1, num2] = getNumbersFromQuestion(currentQuestion);
 
   return (
     <div className="stage-game-screen">
       <MainGameLayout
-        // ⭐ 가공된 순수 숫자를 넘깁니다.
         num1={num1}
         num2={num2}
         operator={currentQuestion.operator || '+'}
         userInput={userInput}
         
+        // ⭐ 상단 HUD 영역: 시인성 개선 및 SHOP 제거
         timerContent={(
           <div className="stage-game-screen__hud">
             <div className="stage-game-screen__hud-left">
-              <button type="button" className="stage-game-screen__icon-button" onClick={onBack}>⬅</button>
-              <div className="stage-game-screen__coin">💰 {coins}</div>
+              <button type="button" className="stage-game-screen__back-button" onClick={onBack}>⬅</button>
+              <div className="stage-game-screen__coin-display">
+                <span className="coin-icon">💰</span>
+                <span className="coin-amount">{coins}</span>
+              </div>
             </div>
             <div className="stage-game-screen__title">{titleText}</div>
-            <button type="button" className="stage-game-screen__shop-button">🛒 SHOP</button>
+            <div className="stage-game-screen__hud-right" /> {/* 레이아웃 균형용 */}
           </div>
         )}
 
@@ -131,8 +138,6 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
             />
           </div>
         )}
-
-        questionContent={null} 
 
         inputContent={(
           <div className="stage-game-screen__input">

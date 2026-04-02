@@ -47,10 +47,11 @@ const styles = {
   },
   /* --- 세로셈 전용 스타일 (폰트 사이즈 하향 조정) --- */
   verticalMathStack: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-    fontFamily: '"Courier New", Courier, monospace',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-end', // 모든 숫자를 오른쪽(일의 자리) 기준으로 정렬
+  justifyContent: 'center',
+  fontFamily: '"Courier New", Courier, monospace',
   },
   mathNumber: {
     // 기존 8vh -> 5.5vh로 축소, 최대 크기도 4rem -> 2.8rem으로 축소
@@ -81,12 +82,13 @@ const styles = {
     borderRadius: '2px',
   },
   answerText: {
-    // 입력값 폰트도 문제 폰트와 동일하게 축소
-    fontSize: 'clamp(1.8rem, 5.5vh, 2.8rem)', 
-    fontWeight: 800,
-    color: '#3182ce',
-    minHeight: '1.2em',
-    letterSpacing: '6px',
+  fontSize: 'clamp(1.8rem, 5.5vh, 2.8rem)',
+  fontWeight: 800,
+  color: '#3182ce',
+  letterSpacing: '6px',
+  minHeight: '1.2em',
+  textAlign: 'right', // 텍스트 자체도 오른쪽 정렬
+  width: '100%',     // 부모 너비를 꽉 채워야 정렬이 잘 보임
   },
   /* --- 기존 카드 스타일 유지 --- */
   timerBarTrack: {
