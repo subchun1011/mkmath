@@ -1,90 +1,87 @@
-// src/hooks/useSpaceBattleLogic.js
 import { useState, useEffect, useCallback } from 'react';
 
 export const useSpaceBattleLogic = () => {
-  const [playerHP, setPlayerHP] = useState(100);
-  const [enemyHP, setEnemyHP] = useState(100);
+  const MAX_HP = 100;
+  const getRandomWeaponRow = () => (Math.random() < 0.5 ? 2 : 3);
+  const clampHp = (value) => {
+    const safeValue = Number.isFinite(value) ? value : MAX_HP;
+    return Math.max(0, Math.min(MAX_HP, safeValue));
+  };
+
+  const [playerHP, setPlayerHP] = useState(MAX_HP);
+  const [enemyHP, setEnemyHP] = useState(MAX_HP);
   const [coins, setCoins] = useState(0);
-  const [actionState, setActionState] = useState('idle'); // 'playerFire', 'enemyFire', 'idle'
+  const [actionState, setActionState] = useState('idle'); 
   
-  // 10문제 맞추면 100% 깎이는 랜덤 데미지 저장소
+  const [combo, setCombo] = useState(0);
+  const [weaponRow, setWeaponRow] = useState(getRandomWeaponRow); 
   const [damageSequence, setDamageSequence] = useState([]);
   const [correctCount, setCorrectCount] = useState(0);
 
-  // [추가] 파생 상태: 게임 종료 여부 판정
+  const isGameOver = enemyHP <= 0 || playerHP <= 0;
   const isWin = enemyHP <= 0;
-  const isLose = playerHP <= 0;
-  const isGameOver = isWin || isLose;
 
-  // 데미지 시퀀스 생성 (합계 100)
   const generateDamageSequence = useCallback(() => {
     let sequence = [];
-    let remaining = 100;
+    let remaining = MAX_HP;
     for (let i = 0; i < 9; i++) {
-      const min = 5;
-      const max = Math.min(15, remaining - (9 - i) * min); 
-      const damage = Math.floor(Math.random() * (max - min + 1)) + min;
+      const damage = Math.floor(Math.random() * 10) + 5;
       sequence.push(damage);
       remaining -= damage;
     }
-    sequence.push(remaining);
+    sequence.push(Math.max(0, remaining));
     return sequence.sort(() => Math.random() - 0.5);
   }, []);
 
-  // 초기화 및 리셋 (게임 재시작 시 호출)
   const resetBattle = useCallback(() => {
-    setPlayerHP(100);
-    setEnemyHP(100);
+    setPlayerHP(MAX_HP);
+    setEnemyHP(MAX_HP);
     setCorrectCount(0);
+    setCombo(0);
+    // 시작 무기는 2열 또는 3열의 첫 번째 컬럼 계열 중 하나를 랜덤 고정한다.
+    setWeaponRow(getRandomWeaponRow());
     setDamageSequence(generateDamageSequence());
     setActionState('idle');
   }, [generateDamageSequence]);
 
   useEffect(() => {
-    setDamageSequence(generateDamageSequence());
-  }, [generateDamageSequence]);
+    resetBattle();
+  }, [resetBattle]);
 
-  // [정답] 우주선 공격 로직
+  // 콤보 0~2: 1열, 3~4: 2열, 5~6: 3열, 7~8: 4열, 9+: 5열
+  const missileCol = Math.min(4, 
+    combo >= 9 ? 4 : combo >= 7 ? 3 : combo >= 5 ? 2 : combo >= 3 ? 1 : 0
+  );
+
   const processCorrect = () => {
-    // 게임이 이미 끝났다면 아무것도 하지 않음
-    if (isGameOver || correctCount >= 10) return;
-
-    const damage = damageSequence[correctCount];
+    if (isGameOver) return;
+    const damage = damageSequence[correctCount] || 10;
     setActionState('playerFire');
-    
-    setEnemyHP((prev) => {
-      const nextHP = Math.max(0, prev - damage);
-      return nextHP;
-    });
-    
-    setCoins((prev) => prev + 10);
-    setCorrectCount((prev) => prev + 1);
+    setEnemyHP((prev) => clampHp(prev - damage));
+    setCorrectCount(prev => prev + 1);
+    setCombo(prev => prev + 1); // ⭐ 콤보 증가
 
     setTimeout(() => setActionState('idle'), 1000);
   };
 
-  // [오답] 적의 반격 로직
   const processWrong = () => {
-    // 게임이 이미 끝났다면 아무것도 하지 않음
     if (isGameOver) return;
-
     setActionState('enemyFire');
-    setPlayerHP((prev) => Math.max(0, prev - 10)); // 플레이어 데미지는 고정 10%
-    
+    setPlayerHP((prev) => clampHp(prev - 10));
+    // 오답 시 콤보만 초기화하고, 시작에 고른 무기 계열(2열/3열)은 유지한다.
+    setCombo(0);
+
     setTimeout(() => setActionState('idle'), 1000);
   };
 
   return {
-    playerHP, 
-    enemyHP, 
-    coins, 
+    playerHP,
+    enemyHP,
+    maxHP: MAX_HP,
     actionState,
-    correctCount,
-    isWin,        // 승리 여부 전달
-    isLose,       // 패배 여부 전달
-    isGameOver,   // 게임 종료 여부 전달
-    processCorrect, 
-    processWrong, 
-    resetBattle
+    combo,
+    weaponRow,
+    missileCol,
+    isWin, isGameOver, processCorrect, processWrong, resetBattle
   };
 };

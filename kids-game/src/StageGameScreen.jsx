@@ -1,39 +1,26 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import MainGameLayout from './MainGameLayout.jsx';
 import { useSpaceBattleLogic } from './hooks/useSpaceBattleLogic'; 
-import { useCoins } from './coins/CoinContext'; // ⭐ 전역 코인 컨텍스트 임포트
+import { useCoins } from './coins/CoinContext'; 
 import SpaceshipBattle from './actionarea/spaceshipbattle/SpaceshipBattle'; 
 import InputArea from './logic/InputArea'; 
 import { getQuestion } from './logic/QuestionFactory'; 
 import './StageGameScreen.css';
 
-/**
- * 어떤 데이터 구조에서도 숫자를 정확히 뽑아내는 헬퍼 함수
- */
-const getNumbersFromQuestion = (q) => {
-  if (!q) return [0, 0];
-  if (q.num1 !== undefined && q.num2 !== undefined) {
-    return [Number(q.num1), Number(q.num2)];
-  }
-  const sourceText = q.text || q.question || q.q || "";
-  const matches = sourceText.match(/\d+/g);
-  if (matches && matches.length >= 2) {
-    return [Number(matches[0]), Number(matches[1])];
-  }
-  return [0, 0];
-};
-
 const StageGameScreen = ({ category, subCategory, level, onBack }) => {
-  // ⭐ 전역 코인 상태 및 기능
   const { coins, earnCoins, loseCoins } = useCoins();
 
-  // 배틀 로직 커스텀 훅 (coins는 전역을 사용하므로 여기서 제외 가능)
+  // ⭐ 로직 훅에서 combo, weaponRow, missileCol을 꼭 구조분해로 가져와야 합니다!
   const { 
     playerHP, 
     enemyHP, 
+    maxHP,
     actionState, 
     isWin, 
     isGameOver, 
+    combo,          // 추가
+    weaponRow,      // 추가
+    missileCol,     // 추가
     processCorrect, 
     processWrong,
     resetBattle 
@@ -74,7 +61,6 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
     setUserInput(prev => prev.slice(1)); 
   }, [isGameOver]);
 
-  // ⭐ 정답 시: 공격 로직 실행 + 10코인 획득
   const handleCorrect = useCallback(() => {
     if (isGameOver) return;
     processCorrect(); 
@@ -86,7 +72,6 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
     }, 600);
   }, [isGameOver, processCorrect, earnCoins, enemyHP, nextQuestion]);
 
-  // ⭐ 오답 시: 피격 로직 실행 + 10코인 차감
   const handleWrong = useCallback(() => {
     if (isGameOver) return;
     processWrong();
@@ -99,9 +84,16 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
     nextQuestion();
   }, [resetBattle, nextQuestion]);
 
-  if (!currentQuestion) {
-    return <div className="stage-game-screen__loading">Loading...</div>;
-  }
+  const getNumbersFromQuestion = (q) => {
+    if (!q) return [0, 0];
+    if (q.num1 !== undefined && q.num2 !== undefined) return [Number(q.num1), Number(q.num2)];
+    const sourceText = q.text || q.question || q.q || "";
+    const matches = sourceText.match(/\d+/g);
+    if (matches && matches.length >= 2) return [Number(matches[0]), Number(matches[1])];
+    return [0, 0];
+  };
+
+  if (!currentQuestion) return <div className="stage-game-screen__loading">Loading...</div>;
 
   const [num1, num2] = getNumbersFromQuestion(currentQuestion);
 
@@ -113,7 +105,6 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
         operator={currentQuestion.operator || '+'}
         userInput={userInput}
         
-        // ⭐ 상단 HUD 영역: 시인성 개선 및 SHOP 제거
         timerContent={(
           <div className="stage-game-screen__hud">
             <div className="stage-game-screen__hud-left">
@@ -124,17 +115,21 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
               </div>
             </div>
             <div className="stage-game-screen__title">{titleText}</div>
-            <div className="stage-game-screen__hud-right" /> {/* 레이아웃 균형용 */}
+            <div className="stage-game-screen__hud-right" />
           </div>
         )}
 
         actionContent={(
           <div className="stage-game-screen__battle">
+            {/* ⭐ 핵심: SpaceshipBattle로 모든 데이터를 전달합니다. */}
             <SpaceshipBattle
               playerHP={playerHP}
               enemyHP={enemyHP}
+              maxHP={maxHP}
               actionState={actionState}
-              missileTier={1} 
+              combo={combo}
+              weaponRow={weaponRow}
+              missileCol={missileCol}
             />
           </div>
         )}
