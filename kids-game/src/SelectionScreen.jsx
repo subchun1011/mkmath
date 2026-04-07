@@ -35,8 +35,8 @@ const SelectionScreen = ({ onStartGame }) => {
         {step === 0 && (
           <>
             <button style={mainBtnStyle} onClick={() => selectCategory('math')}>수학</button>
-            <button style={mainBtnStyle} onClick={() => selectCategory('english')}>영어</button>
-            <button style={mainBtnStyle} onClick={() => selectCategory('hanja')}>한자</button>
+            {/* <button style={mainBtnStyle} onClick={() => selectCategory('english')}>영어</button> */}
+            {/* <button style={mainBtnStyle} onClick={() => selectCategory('hanja')}>한자</button> */}
           </>
         )}
 
