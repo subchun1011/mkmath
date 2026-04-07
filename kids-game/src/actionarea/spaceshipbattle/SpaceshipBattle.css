@@ -49,11 +49,21 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   position: relative;
   width: 120px; 
   height: 100%;
   flex-shrink: 0;
+}
+
+.ship-sprite-wrapper {
+  position: absolute;
+  top: 72%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 미사일 높이: 우주선 포구 위치와 일치 */
@@ -112,6 +122,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 20;
+  animation: explosion-fade 0.2s ease-out forwards;
 }
 
 .vs-logo {
@@ -119,6 +130,21 @@
   color: #ffde59;
   text-shadow: 0 0 10px rgba(255, 222, 89, 0.8);
   margin-bottom: 40px;
+}
+
+@keyframes explosion-fade {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
 }
 
 @media (max-width: 640px) {
