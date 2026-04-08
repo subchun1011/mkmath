@@ -41,7 +41,8 @@ function AppContent() {
   return (
     <div className="App" style={{ 
       width: '100%', 
-      height: 'var(--app-height, 100dvh)', 
+      height: '100dvh',
+      minHeight: '100dvh',
       overflow: 'hidden',
       backgroundColor: '#000000',
       position: 'fixed', 

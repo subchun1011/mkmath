@@ -149,7 +149,7 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
   const isGameReady = Boolean(gameLogic);
 
   return (
-    <div className="stage-game-screen" style={{ height: '100vh', position: 'relative', backgroundColor: '#0a0a2a' }}>
+    <div className="stage-game-screen" style={{ height: '100dvh', minHeight: '100dvh', position: 'relative', backgroundColor: '#0a0a2a' }}>
       <MainGameLayout
         num1={num1}
         num2={num2}

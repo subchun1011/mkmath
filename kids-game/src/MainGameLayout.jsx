@@ -3,11 +3,11 @@ import React from 'react';
 const styles = {
   screen: {
     width: '100%',
-    height: 'var(--app-height, 100dvh)',
-    minHeight: '100svh',
-    maxHeight: 'var(--app-height, 100dvh)',
+    height: '100dvh',
+    minHeight: '100dvh',
+    maxHeight: '100dvh',
     display: 'grid',
-    gridTemplateRows: '8fr 68fr 0fr 24fr',
+    gridTemplateRows: '10fr 45fr 15fr 30fr',
     background: '#000000',
     overflow: 'hidden',
     paddingTop: 'var(--safe-top, 0px)',
@@ -40,7 +40,7 @@ const styles = {
   },
   questionArea: {
     background: 'transparent',
-    padding: '0',
+    padding: 'clamp(4px, 0.8vh, 8px) clamp(8px, 1.8vw, 12px)',
     overflow: 'hidden',
   },
   inputArea: {
@@ -49,6 +49,7 @@ const styles = {
     paddingBottom: 'max(12px, var(--safe-bottom))',
     position: 'relative',
     zIndex: 10000,
+    minHeight: '220px',
   },
   /* --- 세로셈 전용 스타일 (폰트 사이즈 하향 조정) --- */
   verticalMathStack: {
