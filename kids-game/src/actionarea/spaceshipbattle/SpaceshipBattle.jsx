@@ -60,11 +60,11 @@ const SpaceshipBattle = ({
         <div className={`space-battle__ship space-battle__ship--player
           ${actionState === 'playerFire' ? 'fire-recoil-p' : ''} 
           ${actionState === 'enemyFire' ? 'hit-shake' : ''}`}>
-          <div className="ship-sprite-wrapper">
+          <div className="ship-sprite-wrapper ship-sprite-wrapper--player">
             <BattleShipSprite
               type="ship_player"
               state={shipState}
-              scale={1}
+              scale={0.5}
               style={{ mixBlendMode: 'screen' }}
             />
             
@@ -83,11 +83,11 @@ const SpaceshipBattle = ({
         <div className={`space-battle__ship space-battle__ship--enemy
           ${actionState === 'enemyFire' ? 'fire-recoil-e' : ''} 
           ${actionState === 'playerFire' ? 'hit-shake' : ''}`}>
-          <div className="ship-sprite-wrapper">
+          <div className="ship-sprite-wrapper ship-sprite-wrapper--enemy">
             <BattleShipSprite
               type="ship_enemy_sheet"
               state="idle"
-              scale={1}
+              scale={0.5}
               style={{ mixBlendMode: 'screen' }}
             />
             

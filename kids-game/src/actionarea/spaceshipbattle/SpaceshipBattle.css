@@ -34,6 +34,9 @@
 
 .space-battle__ships {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
   width: 100%;
   max-width: none;
   height: 100%;
@@ -43,20 +46,20 @@
 
 .space-battle__ship {
   position: absolute;
-  width: 112px;
-  height: 112px;
+  width: 56px;
+  height: 56px;
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 8;
 }
 
 .space-battle__ship--player {
   left: 16%;
-  top: 48%;
   animation: float-player 2.8s ease-in-out infinite;
 }
 
 .space-battle__ship--enemy {
   right: 16%;
-  top: 48%;
   animation: float-enemy 3.1s ease-in-out infinite;
 }
 
@@ -79,11 +82,11 @@
   background-color: transparent !important;
 }
 
-.space-battle__ship--player .ship-sprite-wrapper {
+.ship-sprite-wrapper--player {
   transform: rotate(90deg);
 }
 
-.space-battle__ship--enemy .ship-sprite-wrapper {
+.ship-sprite-wrapper--enemy {
   transform: rotate(-90deg);
 }
 
@@ -204,20 +207,20 @@
 @keyframes float-player {
   0%,
   100% {
-    transform: translateY(0px);
+    transform: translateY(-50%);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(calc(-50% - 8px));
   }
 }
 
 @keyframes float-enemy {
   0%,
   100% {
-    transform: translateY(0px);
+    transform: translateY(-50%);
   }
   50% {
-    transform: translateY(10px);
+    transform: translateY(calc(-50% + 8px));
   }
 }
 
@@ -232,18 +235,16 @@
   }
 
   .space-battle__ship {
-    width: 92px;
-    height: 92px;
+    width: 46px;
+    height: 46px;
   }
 
   .space-battle__ship--player {
     left: 8%;
-    top: 48%;
   }
 
   .space-battle__ship--enemy {
     right: 8%;
-    top: 48%;
   }
 
   .animate-player {
