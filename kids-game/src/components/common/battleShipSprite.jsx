@@ -73,6 +73,19 @@ function buildLegacyStyle(type, index, scale, firingFrom, overrideStyle) {
   };
 }
 
+const transparentSpriteCache = new Map();
+
+function shouldMakeBlackTransparent(normalizedType, type) {
+  return (
+    normalizedType.startsWith('ship_') ||
+    normalizedType.startsWith('missile_') ||
+    normalizedType === 'energy_core_sheet' ||
+    normalizedType === 'cockpit_hud_fixed' ||
+    normalizedType === 'hologram_screen' ||
+    type === 'effect'
+  );
+}
+
 const BattleShipSprite = ({
   type,
   state = 'idle',
@@ -84,13 +97,12 @@ const BattleShipSprite = ({
   firingFrom,
   ...otherProps
 }) => {
-  const [animationCss, setAnimationCss] = useState('');
-  const [spriteInfo, setSpriteInfo] = useState(null);
-  const [elementStyle, setElementStyle] = useState({});
+  const [processedImageUrl, setProcessedImageUrl] = useState('');
   const elementRef = useRef(null);
   const effectTimeoutRef = useRef(null);
   const imageCheckRef = useRef({ url: null });
   const normalizedType = useMemo(() => mapLegacyTypeToSpriteKey(type), [type]);
+  const styleKey = useMemo(() => JSON.stringify(overrideStyle || {}), [overrideStyle]);
   const elementId = useMemo(
     () => `sprite-${type}-${state}-${Math.random().toString(36).slice(2, 7)}`,
     [state, type],
@@ -102,7 +114,7 @@ const BattleShipSprite = ({
     }
   };
 
-  useEffect(() => {
+  const spriteRenderData = useMemo(() => {
     const canUseSpriteProps = Boolean(SPRITE_DATA[normalizedType]);
 
     if (canUseSpriteProps) {
@@ -130,9 +142,11 @@ const BattleShipSprite = ({
         style: mergedStyle,
       });
 
-      setAnimationCss(animCss || '');
-      setSpriteInfo(info);
-      setElementStyle(style);
+      return {
+        animationCss: animCss || '',
+        spriteInfo: info,
+        elementStyle: style,
+      };
     } else {
       const { style, spriteInfo } = buildLegacyStyle(
         type,
@@ -142,11 +156,27 @@ const BattleShipSprite = ({
         overrideStyle,
       );
 
-      setAnimationCss('');
-      setSpriteInfo(spriteInfo);
-      setElementStyle(style);
+      return {
+        animationCss: '',
+        spriteInfo,
+        elementStyle: style,
+      };
     }
+  }, [
+    animationIterationCount,
+    firingFrom,
+    index,
+    normalizedType,
+    overrideStyle,
+    scale,
+    state,
+    styleKey,
+    type,
+  ]);
 
+  const { animationCss, spriteInfo, elementStyle } = spriteRenderData;
+
+  useEffect(() => {
     const currentElement = elementRef.current;
 
     if (currentElement && onAnimationEnd && animationCss) {
@@ -169,14 +199,7 @@ const BattleShipSprite = ({
     };
   }, [
     animationCss,
-    animationIterationCount,
-    firingFrom,
-    index,
-    normalizedType,
     onAnimationEnd,
-    overrideStyle,
-    scale,
-    state,
     type,
   ]);
 
@@ -185,24 +208,108 @@ const BattleShipSprite = ({
       spriteInfo?.url ||
       (elementStyle.backgroundImage || '').replace(/^url\((['"]?)(.*)\1\)$/, '$2');
 
-    if (!imageUrl || imageCheckRef.current.url === imageUrl) {
+    if (!imageUrl) {
+      setProcessedImageUrl('');
+      return undefined;
+    }
+
+    const shouldProcessTransparency = shouldMakeBlackTransparent(normalizedType, type);
+
+    if (!shouldProcessTransparency) {
+      if (processedImageUrl !== imageUrl) {
+        setProcessedImageUrl(imageUrl);
+      }
+      return undefined;
+    }
+
+    if (transparentSpriteCache.has(imageUrl)) {
+      const cachedUrl = transparentSpriteCache.get(imageUrl);
+      if (processedImageUrl !== cachedUrl) {
+        setProcessedImageUrl(cachedUrl);
+      }
+      return undefined;
+    }
+
+    if (imageCheckRef.current.url === imageUrl) {
       return undefined;
     }
 
     imageCheckRef.current.url = imageUrl;
 
     const testImage = new window.Image();
+    testImage.crossOrigin = 'anonymous';
     testImage.onerror = () => {
       console.warn(
         `BattleShipSprite: Failed to load image for type="${type}" state="${state}". Check this URL in the browser: ${imageUrl}`,
       );
+      if (processedImageUrl !== imageUrl) {
+        setProcessedImageUrl(imageUrl);
+      }
+    };
+    testImage.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = testImage.naturalWidth;
+        canvas.height = testImage.naturalHeight;
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+
+        if (!context) {
+          if (processedImageUrl !== imageUrl) {
+            setProcessedImageUrl(imageUrl);
+          }
+          return;
+        }
+
+        context.drawImage(testImage, 0, 0);
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const { data } = imageData;
+
+        for (let offset = 0; offset < data.length; offset += 4) {
+          const red = data[offset];
+          const green = data[offset + 1];
+          const blue = data[offset + 2];
+          const alpha = data[offset + 3];
+          const brightness = red + green + blue;
+
+          if (alpha === 0) {
+            continue;
+          }
+
+          if (brightness < 42) {
+            data[offset + 3] = 0;
+          } else if (brightness < 72) {
+            data[offset + 3] = Math.round(alpha * 0.25);
+          }
+        }
+
+        context.putImageData(imageData, 0, 0);
+        const dataUrl = canvas.toDataURL('image/png');
+        transparentSpriteCache.set(imageUrl, dataUrl);
+        setProcessedImageUrl((currentUrl) => (currentUrl === dataUrl ? currentUrl : dataUrl));
+      } catch (error) {
+        console.warn(
+          `BattleShipSprite: Transparency preprocessing failed for type="${type}" state="${state}". Falling back to original image.`,
+          error,
+        );
+        if (processedImageUrl !== imageUrl) {
+          setProcessedImageUrl(imageUrl);
+        }
+      }
     };
     testImage.src = imageUrl;
 
     return () => {
       testImage.onerror = null;
+      testImage.onload = null;
     };
-  }, [elementStyle.backgroundImage, spriteInfo?.url, state, type]);
+  }, [
+    elementStyle.backgroundImage,
+    normalizedType,
+    processedImageUrl,
+    spriteInfo?.url,
+    state,
+    type,
+  ]);
 
   if (!spriteInfo) {
     return null;
@@ -228,7 +335,7 @@ const BattleShipSprite = ({
         ref={elementRef}
         id={elementId}
         className={`sprite ${type} ${state}`}
-        src={spriteInfo.url}
+        src={processedImageUrl || spriteInfo.url}
         alt=""
         draggable={false}
         style={{
@@ -250,7 +357,10 @@ const BattleShipSprite = ({
         ref={elementRef}
         id={elementId}
         className={`sprite ${type} ${state}`}
-        style={elementStyle}
+        style={{
+          ...elementStyle,
+          backgroundImage: `url(${processedImageUrl || spriteInfo.url})`,
+        }}
         {...otherProps}
       />
     </>
