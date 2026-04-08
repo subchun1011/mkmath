@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import MainGameLayout from './MainGameLayout.jsx';
 import { useSpaceBattleLogic } from './hooks/useSpaceBattleLogic'; 
 import { useCoins } from './coins/CoinContext'; 
-import SpaceshipBattle from './actionarea/spaceshipbattle/SpaceshipBattle'; 
+import CockpitHUD from './components/battle/CockpitHUD.jsx';
 import InputArea from './logic/InputArea'; 
 import { getQuestion } from './logic/QuestionFactory'; 
 import './StageGameScreen.css';
@@ -48,17 +48,21 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
     return `${label.toUpperCase()} - LV.${level}`;
   }, [category, subCategory, level]);
 
+  const triggerEnergyCoreBurst = useCallback(() => {
+    // CockpitHUD가 코어 이펙트 사운드/진동과 연결될 수 있도록 남겨둔 확장 포인트입니다.
+  }, []);
+
   const handleInput = useCallback((num) => {
     if (isGameOver) return;
     setUserInput(prev => {
-      const next = num + prev; 
+      const next = num + prev;
       return next.length > 4 ? prev : next; 
     });
   }, [isGameOver]);
 
   const handleBackspace = useCallback(() => {
     if (isGameOver) return;
-    setUserInput(prev => prev.slice(1)); 
+    setUserInput(prev => prev.slice(1));
   }, [isGameOver]);
 
   const handleCorrect = useCallback(() => {
@@ -93,16 +97,63 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
     return [0, 0];
   };
 
-  if (!currentQuestion) return <div className="stage-game-screen__loading">Loading...</div>;
+  const safeCurrentQuestion = currentQuestion || {
+    question: '...',
+    answer: '',
+    hint: '문제를 준비하는 중이에요.',
+    category,
+    operator: '+',
+  };
 
-  const [num1, num2] = getNumbersFromQuestion(currentQuestion);
+  const [num1, num2] = getNumbersFromQuestion(safeCurrentQuestion);
+  const operator = safeCurrentQuestion.operator || '+';
+
+  const gameLogic = useMemo(() => ({
+    // CockpitHUD에 전달해야 하는 핵심 상태/함수:
+    // playerHP, enemyHP, maxHP, currentQuestion, num1, num2, operator,
+    // energyCoreLevel, actionState, combo, weaponRow, missileCol, triggerEnergyCoreBurst
+    playerHP,
+    enemyHP,
+    maxHP,
+    currentQuestion: safeCurrentQuestion,
+    num1,
+    num2,
+    operator,
+    userInput,
+    category,
+    hint: safeCurrentQuestion.hint,
+    energyCoreLevel: Math.min(5, missileCol + 1),
+    missileCol,
+    combo,
+    actionState,
+    weaponRow,
+    triggerEnergyCoreBurst,
+  }), [
+    actionState,
+    combo,
+    enemyHP,
+    maxHP,
+    missileCol,
+    num1,
+    num2,
+    operator,
+    playerHP,
+    userInput,
+    category,
+    safeCurrentQuestion.hint,
+    safeCurrentQuestion,
+    triggerEnergyCoreBurst,
+    weaponRow,
+  ]);
+
+  const isGameReady = Boolean(gameLogic);
 
   return (
-    <div className="stage-game-screen">
+    <div className="stage-game-screen" style={{ height: '100vh', position: 'relative', backgroundColor: '#0a0a2a' }}>
       <MainGameLayout
         num1={num1}
         num2={num2}
-        operator={currentQuestion.operator || '+'}
+        operator={operator}
         userInput={userInput}
         
         timerContent={(
@@ -121,16 +172,24 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
 
         actionContent={(
           <div className="stage-game-screen__battle">
-            {/* ⭐ 핵심: SpaceshipBattle로 모든 데이터를 전달합니다. */}
-            <SpaceshipBattle
-              playerHP={playerHP}
-              enemyHP={enemyHP}
-              maxHP={maxHP}
-              actionState={actionState}
-              combo={combo}
-              weaponRow={weaponRow}
-              missileCol={missileCol}
-            />
+            <CockpitHUD gameLogic={gameLogic} />
+            {!currentQuestion && (
+              <div className="stage-game-screen__loading stage-game-screen__loading--overlay">Loading Game...</div>
+            )}
+          </div>
+        )}
+
+        questionContent={(
+          <div className="stage-game-screen__question">
+            <div className="stage-game-screen__question-panel">
+              <div className="stage-game-screen__question-panel-title">COCKPIT LINK</div>
+              <div className="stage-game-screen__question-panel-text">
+                문제는 조종석 홀로그램 화면에 표시됩니다.
+              </div>
+              <div className="stage-game-screen__question-panel-subtext">
+                아래 입력 패드로 답을 입력해 에너지 코어를 충전해보세요.
+              </div>
+            </div>
           </div>
         )}
 
@@ -138,7 +197,7 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
           <div className="stage-game-screen__input">
             <InputArea
               userInput={userInput}
-              correctAnswer={currentQuestion.answer}
+              correctAnswer={safeCurrentQuestion.answer}
               onKeyPress={handleInput}
               onBackspace={handleBackspace}
               onCorrect={handleCorrect}

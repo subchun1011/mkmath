@@ -4,8 +4,7 @@ import SelectionScreen from './SelectionScreen';
 import { CoinProvider } from './coins/CoinContext'; // ⭐ 1. CoinProvider 임포트
 
 function AppContent() {
-  // 전역 상태 관리 (코인 관련 지역 상태는 제거되었습니다)
-  const [view, setView] = useState('selection'); 
+  const [scene, setScene] = useState('setup');
   const [gameConfig, setGameConfig] = useState(null); 
   const [currentMissileTier, setCurrentMissileTier] = useState(1); 
 
@@ -29,23 +28,26 @@ function AppContent() {
 
   const handleStartGame = (config) => {
     setGameConfig(config);
-    setView('game');
+    setScene('battle');
   };
 
   const handleBackToMenu = () => {
-    setView('selection');
+    setScene('setup');
     setGameConfig(null);
   };
+
+  const shouldShowSetup = scene !== 'battle' || !gameConfig;
 
   return (
     <div className="App" style={{ 
       width: '100%', 
       height: 'var(--app-height, 100dvh)', 
       overflow: 'hidden',
+      backgroundColor: '#000000',
       position: 'fixed', 
       top: 0, left: 0 
     }}>
-      {view === 'selection' ? (
+      {shouldShowSetup ? (
         <SelectionScreen onStartGame={handleStartGame} />
       ) : (
         <StageGameScreen 

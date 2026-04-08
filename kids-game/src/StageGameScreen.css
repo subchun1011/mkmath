@@ -2,7 +2,22 @@
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 0;
+  min-height: 100%;
+}
+
+.stage-game-screen__loading {
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+  background: #0a0a2a;
+  color: #c9f8ff;
+  font-size: clamp(0.95rem, 2.2vw, 1.2rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
 }
 
 .stage-game-screen__hud {
@@ -99,28 +114,70 @@
   min-height: 0;
 }
 
+.stage-game-screen__battle {
+  position: relative;
+  overflow: hidden;
+}
+
 .stage-game-screen__question {
   display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.stage-game-screen__question-panel {
+  width: 100%;
+  height: 100%;
+  border-radius: clamp(20px, 3vw, 28px);
+  border: 1px solid rgba(102, 230, 255, 0.22);
+  background:
+    linear-gradient(180deg, rgba(7, 21, 38, 0.94) 0%, rgba(11, 27, 45, 0.98) 100%);
+  display: flex;
   flex-direction: column;
-  gap: clamp(8px, 1.6vh, 14px);
-}
-
-.stage-game-screen__question-header {
-  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(6px, 1vh, 10px);
+  padding: clamp(14px, 2.5vh, 24px);
   text-align: center;
-  color: #f4a300;
-  font-size: clamp(0.9rem, 2.4vw, 1.2rem);
-  font-weight: 900;
-  line-height: 1.1;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 255, 255, 0.06),
+    0 18px 32px rgba(0, 0, 0, 0.2);
 }
 
-.stage-game-screen__question-body {
-  flex: 1 1 auto;
-  min-height: 0;
+.stage-game-screen__question-panel-title {
+  color: #8ff7ff;
+  font-size: clamp(0.72rem, 1.8vw, 0.95rem);
+  font-weight: 900;
+  letter-spacing: 0.18em;
+}
+
+.stage-game-screen__question-panel-text {
+  color: #f7fcff;
+  font-size: clamp(1rem, 2.8vw, 1.35rem);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.stage-game-screen__question-panel-subtext {
+  color: rgba(214, 243, 255, 0.78);
+  font-size: clamp(0.72rem, 1.9vw, 0.95rem);
+  line-height: 1.45;
 }
 
 .stage-game-screen__input {
   min-height: 0;
+  position: relative;
+  z-index: 10010;
+}
+
+.stage-game-screen__loading--overlay {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  border-radius: 0;
+  background: rgba(10, 10, 42, 0.28);
+  backdrop-filter: blur(1px);
+  z-index: 10000;
 }
 
 .stage-game-screen__overlay {

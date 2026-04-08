@@ -18,7 +18,7 @@ html, body {
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  background-color: #5c94fc; /* 기존 배경색 유지 */
+  background-color: #000000;
 }
 
 /* --- 2. 게임 메인 레이아웃 (MainGameLayout용) --- */

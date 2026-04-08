@@ -11,6 +11,14 @@ const InputArea = ({
 }) => {
   const [isShaking, setIsShaking] = useState(false);
 
+  const handleNumberClick = useCallback((value) => {
+    onKeyPress?.(String(value));
+  }, [onKeyPress]);
+
+  const handleDeleteClick = useCallback(() => {
+    onBackspace?.();
+  }, [onBackspace]);
+
   /**
    * 정답 체크 로직
    * 부모의 userInput과 correctAnswer를 비교합니다.
@@ -42,35 +50,31 @@ const InputArea = ({
 
   return (
     <div className={`input-area-container ${isShaking ? 'shake' : ''}`}>
-      {/* 부모(StageGameScreen)에서 관리하는 userInput을 직접 보여줍니다. 
-          세로셈 로직이 적용되어 입력할수록 숫자가 왼쪽으로 밀려납니다.
-      */}
       <div className="input-display">
         {userInput || <span className="placeholder">?</span>}
       </div>
 
-      <div className="keypad">
+      <div className="control-panel keypad">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
           <button 
             key={num} 
             type="button" 
-            onClick={() => onKeyPress(String(num))}
+            className="control-button"
+            onClick={() => handleNumberClick(num)}
           >
             {num}
           </button>
         ))}
         
-        {/* 지우기: 부모의 역순 지우기 로직 호출 */}
-        <button className="btn-clear" type="button" onClick={onBackspace}>
+        <button className="control-button btn-clear delete-button" type="button" onClick={handleDeleteClick}>
           C
         </button>
         
-        <button type="button" onClick={() => onKeyPress('0')}>
+        <button className="control-button" type="button" onClick={() => handleNumberClick(0)}>
           0
         </button>
         
-        {/* 확인: 내부의 handleCheck 실행 */}
-        <button className="btn-confirm" type="button" onClick={handleCheck}>
+        <button className="control-button btn-confirm submit-button" type="button" onClick={handleCheck}>
           확인
         </button>
       </div>

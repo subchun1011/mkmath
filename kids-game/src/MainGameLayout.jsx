@@ -7,8 +7,8 @@ const styles = {
     minHeight: '100svh',
     maxHeight: 'var(--app-height, 100dvh)',
     display: 'grid',
-    gridTemplateRows: '5fr 30fr 30fr 35fr',
-    background: 'linear-gradient(180deg, #f7fbff 0%, #fff5d9 100%)',
+    gridTemplateRows: '8fr 62fr 0fr 30fr',
+    background: '#000000',
     overflow: 'hidden',
     paddingTop: 'var(--safe-top, 0px)',
     paddingBottom: 'var(--safe-bottom, 0px)',
@@ -30,20 +30,25 @@ const styles = {
     padding: 'clamp(8px, 1.6vh, 16px) clamp(10px, 2.4vw, 18px)',
   },
   timerArea: {
-    backgroundColor: '#fff8df',
+    backgroundColor: '#050b14',
     padding: 'clamp(6px, 0.8vh, 10px) clamp(10px, 2.4vw, 18px)',
   },
   actionArea: {
-    background: 'linear-gradient(180deg, #dff4ff 0%, #c8ecff 100%)',
+    background: 'transparent',
     position: 'relative',
+    overflow: 'visible',
   },
   questionArea: {
-    backgroundColor: '#ffffff',
+    background: 'transparent',
+    padding: '0',
+    overflow: 'hidden',
   },
   inputArea: {
-    background: 'linear-gradient(180deg, #fff4cc 0%, #ffe7a3 100%)',
+    background: 'linear-gradient(180deg, #091426 0%, #0d2035 100%)',
     alignItems: 'stretch',
     paddingBottom: 'max(12px, var(--safe-bottom))',
+    position: 'relative',
+    zIndex: 10000,
   },
   /* --- 세로셈 전용 스타일 (폰트 사이즈 하향 조정) --- */
   verticalMathStack: {

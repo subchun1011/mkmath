@@ -8,7 +8,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  isolation: isolate; 
 }
 
 .space-battle__status-layer {
@@ -34,66 +33,109 @@
 }
 
 .space-battle__ships {
-  display: flex;
-  justify-content: space-between; 
-  align-items: flex-end; 
-  width: 100%;
-  max-width: 500px; /* 너무 벌어지지 않게 고정 */
-  height: 100%;
-  padding: 42px 40px 40px 40px; 
-  z-index: 5;
   position: relative;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  padding: 0;
+  z-index: 5;
 }
 
 .space-battle__ship {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  position: relative;
-  width: 120px; 
-  height: 100%;
-  flex-shrink: 0;
+  position: absolute;
+  width: 112px;
+  height: 112px;
+  z-index: 8;
+}
+
+.space-battle__ship--player {
+  left: 16%;
+  top: 48%;
+  animation: float-player 2.8s ease-in-out infinite;
+}
+
+.space-battle__ship--enemy {
+  right: 16%;
+  top: 48%;
+  animation: float-enemy 3.1s ease-in-out infinite;
 }
 
 .ship-sprite-wrapper {
   position: absolute;
-  top: 72%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  mix-blend-mode: screen;
+}
+
+.ship-sprite-wrapper .sprite,
+.ship-sprite-wrapper img.sprite {
+  display: block;
+  filter:
+    drop-shadow(0 0 18px rgba(80, 220, 255, 0.28))
+    drop-shadow(0 0 32px rgba(0, 120, 255, 0.2));
+  mix-blend-mode: screen;
+  background-color: transparent !important;
+}
+
+.space-battle__ship--player .ship-sprite-wrapper {
+  transform: rotate(90deg);
+}
+
+.space-battle__ship--enemy .ship-sprite-wrapper {
+  transform: rotate(-90deg);
 }
 
 /* 미사일 높이: 우주선 포구 위치와 일치 */
 .space-battle__missile {
   position: absolute;
-  top: 72%; 
+  top: 48%;
   z-index: 15;
   pointer-events: none;
+  mix-blend-mode: screen;
 }
 
 .animate-player {
-  left: 20%;
+  left: 28%;
   animation: missile-to-right 0.6s ease-in forwards;
 }
 
 .animate-enemy {
-  right: 20%;
+  right: 28%;
   animation: missile-to-left 0.6s ease-in forwards;
 }
 
+.space-battle__missile .sprite,
+.space-battle__missile img.sprite {
+  display: block;
+  filter:
+    drop-shadow(0 0 8px rgba(80, 240, 255, 0.6))
+    drop-shadow(0 0 18px rgba(0, 162, 255, 0.45));
+  mix-blend-mode: screen;
+  background-color: transparent !important;
+}
+
+.animate-player .sprite,
+.animate-player img.sprite {
+  transform: rotate(90deg);
+}
+
+.animate-enemy .sprite,
+.animate-enemy img.sprite {
+  transform: rotate(-90deg);
+}
+
 @keyframes missile-to-right {
-  0% { transform: translate(0, -50%) scale(0.3); opacity: 0; }
+  0% { transform: translate(0, -50%) scale(0.65); opacity: 0; }
   20% { opacity: 1; }
-  100% { transform: translate(300px, -50%) scale(0.6); opacity: 0; }
+  100% { transform: translate(420px, -50%) scale(0.95); opacity: 0; }
 }
 
 @keyframes missile-to-left {
-  0% { transform: translate(0, -50%) scale(0.3); opacity: 0; }
+  0% { transform: translate(0, -50%) scale(0.65) rotate(180deg); opacity: 0; }
   20% { opacity: 1; }
-  100% { transform: translate(-350px, -50%) scale(0.6); opacity: 0; }
+  100% { transform: translate(-420px, -50%) scale(0.95) rotate(180deg); opacity: 0; }
 }
 
 /* 반동 및 피격 애니메이션 */
@@ -123,13 +165,25 @@
   transform: translate(-50%, -50%);
   z-index: 20;
   animation: explosion-fade 0.2s ease-out forwards;
+  mix-blend-mode: screen;
+}
+
+.explosion-layer .sprite,
+.explosion-layer img.sprite {
+  mix-blend-mode: screen;
+  background-color: transparent !important;
 }
 
 .vs-logo {
-  font-size: 1.8rem;
+  font-size: 2.8rem;
   color: #ffde59;
   text-shadow: 0 0 10px rgba(255, 222, 89, 0.8);
-  margin-bottom: 40px;
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  transform: translate(-50%, -50%);
+  margin-bottom: 0;
+  z-index: 6;
 }
 
 @keyframes explosion-fade {
@@ -147,6 +201,26 @@
   }
 }
 
+@keyframes float-player {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes float-enemy {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+}
+
 @media (max-width: 640px) {
   .space-battle__status-layer {
     top: 8px;
@@ -157,11 +231,31 @@
     width: clamp(108px, 28vw, 150px);
   }
 
-  .space-battle__ships {
-    padding: 40px 18px 26px 18px;
+  .space-battle__ship {
+    width: 92px;
+    height: 92px;
   }
 
-  .space-battle__ship {
-    width: 96px;
+  .space-battle__ship--player {
+    left: 8%;
+    top: 48%;
+  }
+
+  .space-battle__ship--enemy {
+    right: 8%;
+    top: 48%;
+  }
+
+  .animate-player {
+    left: 22%;
+  }
+
+  .animate-enemy {
+    right: 22%;
+  }
+
+  .vs-logo {
+    top: 42%;
+    font-size: 2.2rem;
   }
 }
