@@ -27,7 +27,7 @@
 .cockpit-hud__space-stage {
   width: 100%;
   height: 100%;
-  padding: 0 0 clamp(84px, 14vh, 160px) 0;
+  padding: 0 0 clamp(60px, 9vh, 108px) 0;
   box-sizing: border-box;
   transform: perspective(1200px) translateZ(-80px) scale(1.02);
   transform-origin: center center;
@@ -57,6 +57,7 @@
   align-items: flex-end;
   pointer-events: none;
   mix-blend-mode: screen;
+  background: transparent;
 }
 
 .cockpit-hud-base .sprite {
@@ -87,7 +88,7 @@
 
 .hologram-container {
   position: absolute;
-  bottom: clamp(84px, 13vh, 148px);
+  bottom: clamp(116px, 18vh, 188px);
   left: 50%;
   width: min(43vw, 320px);
   height: auto;
@@ -98,6 +99,7 @@
   text-align: center;
   pointer-events: none;
   mix-blend-mode: screen;
+  background: transparent;
 }
 
 .hologram-container > .sprite {
@@ -264,6 +266,7 @@
   justify-content: center;
   pointer-events: none;
   mix-blend-mode: screen;
+  background: transparent;
 }
 
 .energy-core-container .sprite {
@@ -362,7 +365,7 @@
   }
 
   .hologram-container {
-    bottom: clamp(68px, 11vh, 122px);
+    bottom: clamp(98px, 14vh, 150px);
     width: min(58vw, 260px);
   }
 
@@ -425,12 +428,12 @@
 
 @media (max-width: 768px) {
   .cockpit-hud__space-stage {
-    padding: 0 0 28px 0;
+    padding: 0 0 18px 0;
     transform: perspective(980px) translateZ(-40px) scale(1);
   }
 
   .hologram-container {
-    bottom: clamp(30px, 6vh, 50px);
+    bottom: clamp(72px, 11vh, 112px);
     width: min(58vw, 210px);
   }
 

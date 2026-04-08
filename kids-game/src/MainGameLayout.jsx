@@ -7,7 +7,7 @@ const styles = {
     minHeight: '100svh',
     maxHeight: 'var(--app-height, 100dvh)',
     display: 'grid',
-    gridTemplateRows: '8fr 62fr 0fr 30fr',
+    gridTemplateRows: '8fr 70fr 0fr 22fr',
     background: '#000000',
     overflow: 'hidden',
     paddingTop: 'var(--safe-top, 0px)',

@@ -42,6 +42,7 @@
   height: 100%;
   padding: 0;
   z-index: 5;
+  background: transparent;
 }
 
 .space-battle__ship {
@@ -51,6 +52,7 @@
   top: 50%;
   transform: translateY(-50%);
   z-index: 8;
+  background: transparent;
 }
 
 .space-battle__ship--player {
@@ -70,6 +72,7 @@
   align-items: center;
   justify-content: center;
   mix-blend-mode: screen;
+  background: transparent;
 }
 
 .ship-sprite-wrapper .sprite,
@@ -93,10 +96,11 @@
 /* 미사일 높이: 우주선 포구 위치와 일치 */
 .space-battle__missile {
   position: absolute;
-  top: 48%;
+  top: 50%;
   z-index: 15;
   pointer-events: none;
   mix-blend-mode: screen;
+  background: transparent;
 }
 
 .animate-player {
@@ -169,6 +173,7 @@
   z-index: 20;
   animation: explosion-fade 0.2s ease-out forwards;
   mix-blend-mode: screen;
+  background: transparent;
 }
 
 .explosion-layer .sprite,
@@ -183,10 +188,11 @@
   text-shadow: 0 0 10px rgba(255, 222, 89, 0.8);
   position: absolute;
   left: 50%;
-  top: 44%;
+  top: 50%;
   transform: translate(-50%, -50%);
   margin-bottom: 0;
   z-index: 6;
+  background: transparent;
 }
 
 @keyframes explosion-fade {
@@ -256,7 +262,7 @@
   }
 
   .vs-logo {
-    top: 42%;
+    top: 50%;
     font-size: 2.2rem;
   }
 }
