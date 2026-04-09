@@ -2,12 +2,12 @@
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 220px;
+  min-height: 240px;
   display: flex;
   flex-direction: column;
   gap: clamp(6px, 1vh, 10px);
-  padding: clamp(8px, 1.2vh, 12px);
-  border-radius: clamp(14px, 2vw, 20px);
+  padding: clamp(8px, 1vh, 10px) clamp(10px, 1.8vw, 14px) max(10px, env(safe-area-inset-bottom));
+  border-radius: clamp(14px, 2vw, 20px) clamp(14px, 2vw, 20px) 0 0;
   background:
     linear-gradient(180deg, rgba(8, 18, 34, 0.94) 0%, rgba(10, 24, 42, 0.98) 100%);
   border: 1px solid rgba(91, 214, 255, 0.28);
@@ -15,7 +15,7 @@
     inset 0 0 0 1px rgba(0, 255, 255, 0.08),
     0 10px 20px rgba(0, 0, 0, 0.18);
   box-sizing: border-box;
-  z-index: 10020;
+  z-index: 30000;
   pointer-events: auto;
 }
 
@@ -52,6 +52,7 @@
   grid-auto-rows: minmax(44px, 1fr);
   gap: clamp(6px, 0.9vh, 8px);
   align-content: stretch;
+  justify-items: stretch;
 }
 
 .keypad button,
@@ -130,6 +131,7 @@
 @media (max-height: 760px) {
   .input-area-container {
     gap: 8px;
+    min-height: 220px;
   }
 
   .keypad button {

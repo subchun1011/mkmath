@@ -7,7 +7,7 @@ const styles = {
     minHeight: '100dvh',
     maxHeight: '100dvh',
     display: 'grid',
-    gridTemplateRows: '10fr 45fr 15fr 30fr',
+    gridTemplateRows: '10fr 55fr 0fr 35fr',
     background: '#000000',
     overflow: 'hidden',
     paddingTop: 'var(--safe-top, 0px)',
@@ -37,19 +37,20 @@ const styles = {
     background: 'transparent',
     position: 'relative',
     overflow: 'visible',
+    padding: '0',
   },
   questionArea: {
     background: 'transparent',
-    padding: 'clamp(4px, 0.8vh, 8px) clamp(8px, 1.8vw, 12px)',
+    padding: '0',
     overflow: 'hidden',
   },
   inputArea: {
     background: 'linear-gradient(180deg, #091426 0%, #0d2035 100%)',
     alignItems: 'stretch',
-    paddingBottom: 'max(12px, var(--safe-bottom))',
+    padding: '0 0 max(8px, var(--safe-bottom)) 0',
     position: 'relative',
-    zIndex: 10000,
-    minHeight: '220px',
+    zIndex: 20000,
+    minHeight: '240px',
   },
   /* --- 세로셈 전용 스타일 (폰트 사이즈 하향 조정) --- */
   verticalMathStack: {

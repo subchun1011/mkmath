@@ -179,19 +179,7 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
           </div>
         )}
 
-        questionContent={(
-          <div className="stage-game-screen__question">
-            <div className="stage-game-screen__question-panel">
-              <div className="stage-game-screen__question-panel-title">COCKPIT LINK</div>
-              <div className="stage-game-screen__question-panel-text">
-                문제는 조종석 홀로그램 화면에 표시됩니다.
-              </div>
-              <div className="stage-game-screen__question-panel-subtext">
-                아래 입력 패드로 답을 입력해 에너지 코어를 충전해보세요.
-              </div>
-            </div>
-          </div>
-        )}
+        questionContent={null}
 
         inputContent={(
           <div className="stage-game-screen__input">

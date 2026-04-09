@@ -57,11 +57,23 @@
 
 .space-battle__ship--player {
   left: 16%;
-  animation: float-player 2.8s ease-in-out infinite;
 }
 
 .space-battle__ship--enemy {
   right: 16%;
+}
+
+.space-battle__ship-motion {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.space-battle__ship-motion--player {
+  animation: float-player 2.8s ease-in-out infinite;
+}
+
+.space-battle__ship-motion--enemy {
   animation: float-enemy 3.1s ease-in-out infinite;
 }
 

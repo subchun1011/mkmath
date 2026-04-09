@@ -57,16 +57,18 @@ const SpaceshipBattle = ({
       <div className="space-battle__ships">
         
         {/* --- 1. 플레이어 비행선 (HERO) --- */}
-        <div className={`space-battle__ship space-battle__ship--player
-          ${actionState === 'playerFire' ? 'fire-recoil-p' : ''} 
-          ${actionState === 'enemyFire' ? 'hit-shake' : ''}`}>
-          <div className="ship-sprite-wrapper ship-sprite-wrapper--player">
-            <BattleShipSprite
-              type="ship_player"
-              state={shipState}
-              scale={0.5}
-              style={{ mixBlendMode: 'screen' }}
-            />
+        <div className="space-battle__ship space-battle__ship--player">
+          <div className={`space-battle__ship-motion space-battle__ship-motion--player
+            ${actionState === 'playerFire' ? 'fire-recoil-p' : ''} 
+            ${actionState === 'enemyFire' ? 'hit-shake' : ''}`}>
+            <div className="ship-sprite-wrapper ship-sprite-wrapper--player">
+              <BattleShipSprite
+                type="ship_player"
+                state={shipState}
+                scale={0.5}
+                style={{ mixBlendMode: 'screen' }}
+              />
+            </div>
             
             {/* 플레이어 피격 폭발 레이어 */}
             {actionState === 'enemyFire' && (
@@ -80,16 +82,18 @@ const SpaceshipBattle = ({
         <div className="vs-logo">VS</div>
 
         {/* --- 2. 컴퓨터 비행선 (ALIEN) --- */}
-        <div className={`space-battle__ship space-battle__ship--enemy
-          ${actionState === 'enemyFire' ? 'fire-recoil-e' : ''} 
-          ${actionState === 'playerFire' ? 'hit-shake' : ''}`}>
-          <div className="ship-sprite-wrapper ship-sprite-wrapper--enemy">
-            <BattleShipSprite
-              type="ship_enemy_sheet"
-              state="idle"
-              scale={0.5}
-              style={{ mixBlendMode: 'screen' }}
-            />
+        <div className="space-battle__ship space-battle__ship--enemy">
+          <div className={`space-battle__ship-motion space-battle__ship-motion--enemy
+            ${actionState === 'enemyFire' ? 'fire-recoil-e' : ''} 
+            ${actionState === 'playerFire' ? 'hit-shake' : ''}`}>
+            <div className="ship-sprite-wrapper ship-sprite-wrapper--enemy">
+              <BattleShipSprite
+                type="ship_enemy_sheet"
+                state="idle"
+                scale={0.5}
+                style={{ mixBlendMode: 'screen' }}
+              />
+            </div>
             
             {/* 적군 피격 폭발 레이어 (미사일에 맞춰 커짐) */}
             {actionState === 'playerFire' && (
