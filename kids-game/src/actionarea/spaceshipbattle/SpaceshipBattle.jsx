@@ -67,7 +67,6 @@ const SpaceshipBattle = ({
                   type="ship_player"
                   state={shipState}
                   scale={0.5}
-                  style={{ mixBlendMode: 'screen' }}
                 />
               </div>
               
@@ -94,7 +93,6 @@ const SpaceshipBattle = ({
                   type="ship_enemy_sheet"
                   state="still"
                   scale={0.5}
-                  style={{ mixBlendMode: 'screen' }}
                 />
               </div>
               
@@ -120,7 +118,6 @@ const SpaceshipBattle = ({
               state={missileTier}
               scale={0.25 + (missileCol * 0.02)}
               firingFrom="player"
-              style={{ mixBlendMode: 'screen' }}
             />
           </div>
         )}
@@ -132,7 +129,6 @@ const SpaceshipBattle = ({
               state="tier1"
               scale={0.25}
               firingFrom="enemy"
-              style={{ mixBlendMode: 'screen' }}
             />
           </div>
         )}

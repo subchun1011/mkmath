@@ -84,8 +84,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  mix-blend-mode: screen;
   background: transparent;
+  background-color: transparent;
 }
 
 .ship-sprite-wrapper .sprite,
@@ -94,7 +94,6 @@
   filter:
     drop-shadow(0 0 18px rgba(80, 220, 255, 0.28))
     drop-shadow(0 0 32px rgba(0, 120, 255, 0.2));
-  mix-blend-mode: screen;
   background-color: transparent !important;
 }
 
@@ -112,7 +111,6 @@
   top: 50%;
   z-index: 15;
   pointer-events: none;
-  mix-blend-mode: screen;
   background: transparent;
 }
 
@@ -132,7 +130,6 @@
   filter:
     drop-shadow(0 0 8px rgba(80, 240, 255, 0.6))
     drop-shadow(0 0 18px rgba(0, 162, 255, 0.45));
-  mix-blend-mode: screen;
   background-color: transparent !important;
 }
 
@@ -185,13 +182,11 @@
   transform: translate(-50%, -50%);
   z-index: 20;
   animation: explosion-fade 0.2s ease-out forwards;
-  mix-blend-mode: screen;
   background: transparent;
 }
 
 .explosion-layer .sprite,
 .explosion-layer img.sprite {
-  mix-blend-mode: screen;
   background-color: transparent !important;
 }
 

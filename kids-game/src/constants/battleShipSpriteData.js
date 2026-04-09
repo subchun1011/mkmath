@@ -57,7 +57,7 @@ const getSpriteUrl = (filename) => {
 export const SPRITE_DATA = {};
 
 const SHIP_SHEET_FRAME_WIDTH = 100;
-const SHIP_SHEET_FRAME_HEIGHT = 100;
+const SHIP_SHEET_FRAME_HEIGHT = 125;
 const SHIP_SHEET_COLS = 5;
 const SHIP_SHEET_ROWS = 4;
 
@@ -101,7 +101,7 @@ const shipPlayerInfo = {
 
 // Enemy Ship Sheet - 4 rows, 5 columns per row
 const ENEMY_FRAME_WIDTH = 100;
-const ENEMY_FRAME_HEIGHT = 100;
+const ENEMY_FRAME_HEIGHT = 125;
 
 const enemyShipSheetInfo = {
   url: getSpriteUrl('ship_enemy_sheet.png'),

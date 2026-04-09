@@ -79,47 +79,107 @@ function shouldMakeBlackTransparent(normalizedType, type) {
   return (
     normalizedType.startsWith('ship_') ||
     normalizedType.startsWith('missile_') ||
-    normalizedType === 'energy_core_sheet' ||
-    normalizedType === 'cockpit_hud_fixed' ||
-    normalizedType === 'hologram_screen' ||
     type === 'effect'
   );
 }
 
-function removeNearBlackBackground(imageData) {
-  const { data } = imageData;
+function isNearBlackBackgroundPixel(data, offset) {
+  const red = data[offset];
+  const green = data[offset + 1];
+  const blue = data[offset + 2];
+  const alpha = data[offset + 3];
 
+  if (alpha === 0) {
+    return true;
+  }
+
+  const maxChannel = Math.max(red, green, blue);
+  const minChannel = Math.min(red, green, blue);
+  const saturationGap = maxChannel - minChannel;
+  const brightness = red + green + blue;
+
+  return (
+    maxChannel <= 34 ||
+    (maxChannel <= 58 && brightness <= 120 && saturationGap <= 22) ||
+    (maxChannel <= 74 && brightness <= 156 && saturationGap <= 14)
+  );
+}
+
+function softenDarkEdgePixels(data) {
   for (let offset = 0; offset < data.length; offset += 4) {
-    const red = data[offset];
-    const green = data[offset + 1];
-    const blue = data[offset + 2];
     const alpha = data[offset + 3];
-    const maxChannel = Math.max(red, green, blue);
-    const minChannel = Math.min(red, green, blue);
-    const saturationGap = maxChannel - minChannel;
-    const brightness = red + green + blue;
 
     if (alpha === 0) {
       continue;
     }
 
-    // 완전한 검정 또는 거의 검정 배경은 완전히 제거
-    if (maxChannel <= 28) {
-      data[offset + 3] = 0;
-      continue;
-    }
+    const red = data[offset];
+    const green = data[offset + 1];
+    const blue = data[offset + 2];
+    const maxChannel = Math.max(red, green, blue);
+    const minChannel = Math.min(red, green, blue);
+    const saturationGap = maxChannel - minChannel;
+    const brightness = red + green + blue;
 
-    // 어두운 회색/검정 계열 배경은 강하게 약화
-    if (maxChannel <= 52 && saturationGap <= 18) {
-      data[offset + 3] = Math.round(alpha * 0.08);
-      continue;
-    }
-
-    // 조금 더 밝지만 여전히 배경으로 보이는 저채도 암부는 추가 감쇠
-    if (brightness <= 120 && saturationGap <= 24) {
-      data[offset + 3] = Math.round(alpha * 0.28);
+    if (maxChannel <= 62 && brightness <= 144 && saturationGap <= 20) {
+      data[offset + 3] = Math.min(alpha, 36);
+    } else if (maxChannel <= 82 && brightness <= 180 && saturationGap <= 18) {
+      data[offset + 3] = Math.min(alpha, 96);
     }
   }
+}
+
+function removeNearBlackBackground(imageData) {
+  const { data, width, height } = imageData;
+  const visited = new Uint8Array(width * height);
+  const queue = [];
+
+  const enqueue = (x, y) => {
+    if (x < 0 || y < 0 || x >= width || y >= height) {
+      return;
+    }
+
+    const pixelIndex = y * width + x;
+
+    if (visited[pixelIndex]) {
+      return;
+    }
+
+    const offset = pixelIndex * 4;
+
+    if (!isNearBlackBackgroundPixel(data, offset)) {
+      return;
+    }
+
+    visited[pixelIndex] = 1;
+    queue.push(pixelIndex);
+  };
+
+  for (let x = 0; x < width; x += 1) {
+    enqueue(x, 0);
+    enqueue(x, height - 1);
+  }
+
+  for (let y = 0; y < height; y += 1) {
+    enqueue(0, y);
+    enqueue(width - 1, y);
+  }
+
+  while (queue.length > 0) {
+    const pixelIndex = queue.shift();
+    const x = pixelIndex % width;
+    const y = Math.floor(pixelIndex / width);
+    const offset = pixelIndex * 4;
+
+    data[offset + 3] = 0;
+
+    enqueue(x + 1, y);
+    enqueue(x - 1, y);
+    enqueue(x, y + 1);
+    enqueue(x, y - 1);
+  }
+
+  softenDarkEdgePixels(data);
 
   return imageData;
 }
@@ -138,7 +198,6 @@ const BattleShipSprite = ({
   const [processedImageUrl, setProcessedImageUrl] = useState('');
   const elementRef = useRef(null);
   const effectTimeoutRef = useRef(null);
-  const imageCheckRef = useRef({ url: null });
   const normalizedType = useMemo(() => mapLegacyTypeToSpriteKey(type), [type]);
   const styleKey = useMemo(() => JSON.stringify(overrideStyle || {}), [overrideStyle]);
   const elementId = useMemo(
@@ -156,18 +215,11 @@ const BattleShipSprite = ({
     const canUseSpriteProps = Boolean(SPRITE_DATA[normalizedType]);
 
     if (canUseSpriteProps) {
-      const shouldGlow =
-        normalizedType.startsWith('ship_') ||
-        normalizedType.startsWith('missile_') ||
-        normalizedType === 'energy_core_sheet' ||
-        normalizedType === 'cockpit_hud_fixed' ||
-        normalizedType === 'hologram_screen';
-
       const mergedStyle = {
         imageRendering: 'pixelated',
         display: 'inline-block',
         opacity: 1,
-        mixBlendMode: shouldGlow ? 'screen' : 'normal',
+        mixBlendMode: 'normal',
         ...overrideStyle,
       };
       const {
@@ -268,15 +320,15 @@ const BattleShipSprite = ({
       return undefined;
     }
 
-    if (imageCheckRef.current.url === imageUrl) {
-      return undefined;
-    }
-
-    imageCheckRef.current.url = imageUrl;
+    let isCancelled = false;
 
     const testImage = new window.Image();
     testImage.crossOrigin = 'anonymous';
     testImage.onerror = () => {
+      if (isCancelled) {
+        return;
+      }
+
       console.warn(
         `BattleShipSprite: Failed to load image for type="${type}" state="${state}". Check this URL in the browser: ${imageUrl}`,
       );
@@ -285,6 +337,10 @@ const BattleShipSprite = ({
       }
     };
     testImage.onload = () => {
+      if (isCancelled) {
+        return;
+      }
+
       try {
         const canvas = document.createElement('canvas');
         canvas.width = testImage.naturalWidth;
@@ -318,6 +374,7 @@ const BattleShipSprite = ({
     testImage.src = imageUrl;
 
     return () => {
+      isCancelled = true;
       testImage.onerror = null;
       testImage.onload = null;
     };
