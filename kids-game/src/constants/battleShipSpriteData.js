@@ -21,7 +21,6 @@ function warnOnce(key, message) {
 }
 
 const BASE_SPRITE_PATH = 'src/assets/images/battleShipIMG/';
-
 const SPRITE_URLS = {
   'cockpit_hud_fixed.png': cockpitHudFixedPng,
   'energy_core_sheet.png': energyCoreSheetPng,
@@ -34,6 +33,14 @@ const SPRITE_URLS = {
 
 // 스프라이트 시트 URL 조합 함수
 const getSpriteUrl = (filename) => {
+  if (!filename) {
+    warnOnce(
+      `sprite-file:${filename}`,
+      `BattleShipSpriteData: "${filename}" could not be resolved from ${BASE_SPRITE_PATH}.`,
+    );
+    return '';
+  }
+
   const resolvedUrl = SPRITE_URLS[filename];
 
   if (!resolvedUrl) {
@@ -68,6 +75,13 @@ const shipPlayerInfo = {
   sheetWidth: SHIP_SHEET_FRAME_WIDTH * SHIP_SHEET_COLS,
   sheetHeight: SHIP_SHEET_FRAME_HEIGHT * SHIP_SHEET_ROWS,
   states: {
+    still: {
+      x: 0,
+      y: 0,
+      frames: 1,
+      frameWidth: SHIP_SHEET_FRAME_WIDTH,
+      frameHeight: SHIP_SHEET_FRAME_HEIGHT,
+    },
     idle: {
       x: 0,
       y: 0,
@@ -102,6 +116,13 @@ const enemyShipSheetInfo = {
   sheetWidth: ENEMY_FRAME_WIDTH * 5,
   sheetHeight: ENEMY_FRAME_HEIGHT * 4,
   states: {
+    still: {
+      x: 0,
+      y: 0,
+      frames: 1,
+      frameWidth: ENEMY_FRAME_WIDTH,
+      frameHeight: ENEMY_FRAME_HEIGHT,
+    },
     idle: {
       x: 0,
       y: 0,

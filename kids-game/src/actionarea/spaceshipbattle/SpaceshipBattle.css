@@ -63,17 +63,18 @@
   right: 16%;
 }
 
-.space-battle__ship-motion {
+.space-battle__ship-float,
+.space-battle__ship-react {
   position: relative;
   width: 100%;
   height: 100%;
 }
 
-.space-battle__ship-motion--player {
+.space-battle__ship-float--player {
   animation: float-player 2.8s ease-in-out infinite;
 }
 
-.space-battle__ship-motion--enemy {
+.space-battle__ship-float--enemy {
   animation: float-enemy 3.1s ease-in-out infinite;
 }
 
@@ -98,11 +99,11 @@
 }
 
 .ship-sprite-wrapper--player {
-  transform: rotate(90deg);
+  transform: rotate(90deg) scale(1);
 }
 
 .ship-sprite-wrapper--enemy {
-  transform: rotate(-90deg);
+  transform: rotate(-90deg) scale(1);
 }
 
 /* 미사일 높이: 우주선 포구 위치와 일치 */

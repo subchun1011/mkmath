@@ -17,7 +17,7 @@ const SpaceshipBattle = ({
   // 콤보에 따른 폭발 크기
   const explosionScale = 0.7 + (missileCol * 0.15);
   const [effectIndex, setEffectIndex] = useState(0);
-  const shipState = actionState === 'playerFire' || actionState === 'enemyFire' ? 'idle' : 'idle';
+  const shipState = 'still';
   const missileTier = `tier${Math.max(1, Math.min(5, missileCol + 1))}`;
 
   useEffect(() => {
@@ -58,24 +58,26 @@ const SpaceshipBattle = ({
         
         {/* --- 1. 플레이어 비행선 (HERO) --- */}
         <div className="space-battle__ship space-battle__ship--player">
-          <div className={`space-battle__ship-motion space-battle__ship-motion--player
-            ${actionState === 'playerFire' ? 'fire-recoil-p' : ''} 
-            ${actionState === 'enemyFire' ? 'hit-shake' : ''}`}>
-            <div className="ship-sprite-wrapper ship-sprite-wrapper--player">
-              <BattleShipSprite
-                type="ship_player"
-                state={shipState}
-                scale={0.5}
-                style={{ mixBlendMode: 'screen' }}
-              />
-            </div>
-            
-            {/* 플레이어 피격 폭발 레이어 */}
-            {actionState === 'enemyFire' && (
-              <div className="explosion-layer">
-                <BattleShipSprite type="effect" index={effectIndex} scale={0.8} />
+          <div className="space-battle__ship-float space-battle__ship-float--player">
+            <div className={`space-battle__ship-react
+              ${actionState === 'playerFire' ? 'fire-recoil-p' : ''} 
+              ${actionState === 'enemyFire' ? 'hit-shake' : ''}`}>
+              <div className="ship-sprite-wrapper ship-sprite-wrapper--player">
+                <BattleShipSprite
+                  type="ship_player"
+                  state={shipState}
+                  scale={0.5}
+                  style={{ mixBlendMode: 'screen' }}
+                />
               </div>
-            )}
+              
+              {/* 플레이어 피격 폭발 레이어 */}
+              {actionState === 'enemyFire' && (
+                <div className="explosion-layer">
+                  <BattleShipSprite type="effect" index={effectIndex} scale={0.8} />
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -83,28 +85,30 @@ const SpaceshipBattle = ({
 
         {/* --- 2. 컴퓨터 비행선 (ALIEN) --- */}
         <div className="space-battle__ship space-battle__ship--enemy">
-          <div className={`space-battle__ship-motion space-battle__ship-motion--enemy
-            ${actionState === 'enemyFire' ? 'fire-recoil-e' : ''} 
-            ${actionState === 'playerFire' ? 'hit-shake' : ''}`}>
-            <div className="ship-sprite-wrapper ship-sprite-wrapper--enemy">
-              <BattleShipSprite
-                type="ship_enemy_sheet"
-                state="idle"
-                scale={0.5}
-                style={{ mixBlendMode: 'screen' }}
-              />
-            </div>
-            
-            {/* 적군 피격 폭발 레이어 (미사일에 맞춰 커짐) */}
-            {actionState === 'playerFire' && (
-              <div className="explosion-layer">
-                <BattleShipSprite 
-                  type="effect" 
-                  index={effectIndex} 
-                  scale={explosionScale} 
+          <div className="space-battle__ship-float space-battle__ship-float--enemy">
+            <div className={`space-battle__ship-react
+              ${actionState === 'enemyFire' ? 'fire-recoil-e' : ''} 
+              ${actionState === 'playerFire' ? 'hit-shake' : ''}`}>
+              <div className="ship-sprite-wrapper ship-sprite-wrapper--enemy">
+                <BattleShipSprite
+                  type="ship_enemy_sheet"
+                  state="still"
+                  scale={0.5}
+                  style={{ mixBlendMode: 'screen' }}
                 />
               </div>
-            )}
+              
+              {/* 적군 피격 폭발 레이어 (미사일에 맞춰 커짐) */}
+              {actionState === 'playerFire' && (
+                <div className="explosion-layer">
+                  <BattleShipSprite 
+                    type="effect" 
+                    index={effectIndex} 
+                    scale={explosionScale} 
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

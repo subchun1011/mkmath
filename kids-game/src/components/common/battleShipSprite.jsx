@@ -86,6 +86,44 @@ function shouldMakeBlackTransparent(normalizedType, type) {
   );
 }
 
+function removeNearBlackBackground(imageData) {
+  const { data } = imageData;
+
+  for (let offset = 0; offset < data.length; offset += 4) {
+    const red = data[offset];
+    const green = data[offset + 1];
+    const blue = data[offset + 2];
+    const alpha = data[offset + 3];
+    const maxChannel = Math.max(red, green, blue);
+    const minChannel = Math.min(red, green, blue);
+    const saturationGap = maxChannel - minChannel;
+    const brightness = red + green + blue;
+
+    if (alpha === 0) {
+      continue;
+    }
+
+    // 완전한 검정 또는 거의 검정 배경은 완전히 제거
+    if (maxChannel <= 28) {
+      data[offset + 3] = 0;
+      continue;
+    }
+
+    // 어두운 회색/검정 계열 배경은 강하게 약화
+    if (maxChannel <= 52 && saturationGap <= 18) {
+      data[offset + 3] = Math.round(alpha * 0.08);
+      continue;
+    }
+
+    // 조금 더 밝지만 여전히 배경으로 보이는 저채도 암부는 추가 감쇠
+    if (brightness <= 120 && saturationGap <= 24) {
+      data[offset + 3] = Math.round(alpha * 0.28);
+    }
+  }
+
+  return imageData;
+}
+
 const BattleShipSprite = ({
   type,
   state = 'idle',
@@ -262,27 +300,8 @@ const BattleShipSprite = ({
 
         context.drawImage(testImage, 0, 0);
         const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        const { data } = imageData;
-
-        for (let offset = 0; offset < data.length; offset += 4) {
-          const red = data[offset];
-          const green = data[offset + 1];
-          const blue = data[offset + 2];
-          const alpha = data[offset + 3];
-          const brightness = red + green + blue;
-
-          if (alpha === 0) {
-            continue;
-          }
-
-          if (brightness < 42) {
-            data[offset + 3] = 0;
-          } else if (brightness < 72) {
-            data[offset + 3] = Math.round(alpha * 0.25);
-          }
-        }
-
-        context.putImageData(imageData, 0, 0);
+        const processedImageData = removeNearBlackBackground(imageData);
+        context.putImageData(processedImageData, 0, 0);
         const dataUrl = canvas.toDataURL('image/png');
         transparentSpriteCache.set(imageUrl, dataUrl);
         setProcessedImageUrl((currentUrl) => (currentUrl === dataUrl ? currentUrl : dataUrl));
@@ -320,6 +339,7 @@ const BattleShipSprite = ({
     (spriteInfo.frames || 1) === 1 &&
     !animationCss &&
     !spriteInfo.states;
+  const shouldProcessTransparency = shouldMakeBlackTransparent(normalizedType, type);
 
   if (renderAsImage) {
     const {

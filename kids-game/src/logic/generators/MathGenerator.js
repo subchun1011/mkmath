@@ -70,8 +70,17 @@ function createSubtraction(level) {
  * 3. 곱셈 생성기 (우측 숫자는 최대 2자리로 제한하여 난이도 조절)
  */
 function createMultiplication(level) {
-  const num1 = getRandomNumberMixed(level);
-  const num2 = getRandomNumberMixed(Math.min(2, level));
+  const multiplicationRanges = {
+    1: [2, 4],
+    2: [5, 7],
+    3: [8, 9],
+    4: [10, 15],
+    5: [15, 19],
+  };
+
+  const [minDan, maxDan] = multiplicationRanges[level] || multiplicationRanges[1];
+  const num1 = Math.floor(Math.random() * (maxDan - minDan + 1)) + minDan;
+  const num2 = Math.floor(Math.random() * 9) + 1;
   const answer = num1 * num2;
 
   return {
@@ -80,6 +89,7 @@ function createMultiplication(level) {
     operator: '×',
     answer: String(answer),
     options: buildOptions(answer),
+    hint: `${num1}단을 떠올려봐!`,
     text: `${num1} × ${num2} = ?`
   };
 }
