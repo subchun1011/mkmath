@@ -189,7 +189,7 @@
   padding: clamp(16px, 4vw, 28px);
   background: rgba(0, 0, 0, 0.82);
   backdrop-filter: blur(4px);
-  z-index: 10;
+  z-index: 20000;
 }
 
 .stage-game-screen__modal {
