@@ -7,6 +7,8 @@ import InputArea from './logic/InputArea';
 import { getQuestion } from './logic/QuestionFactory'; 
 import './StageGameScreen.css';
 
+const TOTAL_QUESTIONS = 10;
+
 const StageGameScreen = ({ category, subCategory, level, onBack }) => {
   const { coins, earnCoins, loseCoins } = useCoins();
 
@@ -29,6 +31,7 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [userInput, setUserInput] = useState(''); 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [completedQuestionCount, setCompletedQuestionCount] = useState(0);
   const [score, setScore] = useState(0);
   const [battleSessionId, setBattleSessionId] = useState(0);
   const timerRef = useRef(null);
@@ -41,6 +44,7 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
 
   useEffect(() => {
     setCurrentQuestionIndex(0);
+    setCompletedQuestionCount(0);
     setScore(0);
     setBattleSessionId((prev) => prev + 1);
     nextQuestion();
@@ -54,51 +58,65 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
     return `${label.toUpperCase()} - LV.${level}`;
   }, [category, subCategory, level]);
 
+  const isStageCleared = completedQuestionCount >= TOTAL_QUESTIONS;
+  const showResultOverlay = isGameOver || isStageCleared;
+  const isVictoryResult = isWin || isStageCleared;
+
   const triggerEnergyCoreBurst = useCallback(() => {
     // CockpitHUD가 코어 이펙트 사운드/진동과 연결될 수 있도록 남겨둔 확장 포인트입니다.
   }, []);
 
   const handleInput = useCallback((num) => {
-    if (isGameOver) return;
+    if (showResultOverlay) return;
     setUserInput(prev => {
       const next = num + prev;
       return next.length > 4 ? prev : next; 
     });
-  }, [isGameOver]);
+  }, [showResultOverlay]);
 
   const handleBackspace = useCallback(() => {
-    if (isGameOver) return;
+    if (showResultOverlay) return;
     setUserInput(prev => prev.slice(1));
-  }, [isGameOver]);
+  }, [showResultOverlay]);
 
   const handleCorrect = useCallback(() => {
-    if (isGameOver) return;
+    if (showResultOverlay) return;
     const result = processCorrect();
     if (!result.didFire) return;
 
+    const nextCompletedQuestionCount = completedQuestionCount + 1;
+
+    setCompletedQuestionCount(nextCompletedQuestionCount);
     setScore((prev) => prev + 10);
     earnCoins(10); 
     
     if (timerRef.current) clearTimeout(timerRef.current);
+    if (nextCompletedQuestionCount >= TOTAL_QUESTIONS) {
+      setCurrentQuestionIndex(TOTAL_QUESTIONS - 1);
+      setUserInput('');
+      return;
+    }
+
     if (result.nextEnemyHP > 0) {
       timerRef.current = setTimeout(() => {
         setCurrentQuestionIndex((prev) => prev + 1);
         nextQuestion();
       }, 600);
     }
-  }, [isGameOver, processCorrect, earnCoins, nextQuestion]);
+  }, [showResultOverlay, processCorrect, completedQuestionCount, earnCoins, nextQuestion]);
 
   const handleWrong = useCallback(() => {
-    if (isGameOver) return;
+    if (showResultOverlay) return;
     processWrong();
     loseCoins(10); 
     setUserInput(''); 
-  }, [isGameOver, processWrong, loseCoins]);
+  }, [showResultOverlay, processWrong, loseCoins]);
 
   const handleRetry = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     resetBattle();
     setCurrentQuestionIndex(0);
+    setCompletedQuestionCount(0);
     setScore(0);
     setUserInput('');
     setBattleSessionId((prev) => prev + 1);
@@ -109,6 +127,7 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
     if (timerRef.current) clearTimeout(timerRef.current);
     resetBattle();
     setCurrentQuestionIndex(0);
+    setCompletedQuestionCount(0);
     setScore(0);
     setUserInput('');
     setCurrentQuestion(null);
@@ -158,11 +177,13 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
     triggerEnergyCoreBurst,
     battleSessionId,
     currentQuestionIndex,
+    completedQuestionCount,
     score,
   }), [
     actionState,
     battleSessionId,
     combo,
+    completedQuestionCount,
     currentQuestionIndex,
     enemyHP,
     maxHP,
@@ -227,17 +248,17 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
         )}
       />
 
-      {isGameOver && (
+      {showResultOverlay && (
         <div className="stage-game-screen__overlay">
           <div className="stage-game-screen__modal">
-            <h2 className={`stage-game-screen__modal-title ${isWin ? 'stage-game-screen__modal-title--win' : 'stage-game-screen__modal-title--lose'}`}>
-              {isWin ? "YOU WIN! 🏆" : "Try Again... 💀"}
+            <h2 className={`stage-game-screen__modal-title ${isVictoryResult ? 'stage-game-screen__modal-title--win' : 'stage-game-screen__modal-title--lose'}`}>
+              {isVictoryResult ? "YOU WIN! 🏆" : "Try Again... 💀"}
             </h2>
             <p className="stage-game-screen__modal-text">
-              {isWin ? "Great job! You defeated the enemy." : "Don't give up! Practice makes perfect."}
+              {isVictoryResult ? "Great job! You cleared all 10 questions." : "Don't give up! Practice makes perfect."}
             </p>
             <div className="stage-game-screen__modal-actions">
-              {isWin ? (
+              {isVictoryResult ? (
                 <button type="button" className="stage-game-screen__primary-button" onClick={handleContinue}>CONTINUE</button>
               ) : (
                 <>
