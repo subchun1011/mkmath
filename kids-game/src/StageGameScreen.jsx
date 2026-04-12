@@ -28,6 +28,9 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
 
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [userInput, setUserInput] = useState(''); 
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [battleSessionId, setBattleSessionId] = useState(0);
   const timerRef = useRef(null);
 
   const nextQuestion = useCallback(() => {
@@ -37,7 +40,10 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
   }, [category, level, subCategory]);
 
   useEffect(() => {
-    nextQuestion(); 
+    setCurrentQuestionIndex(0);
+    setScore(0);
+    setBattleSessionId((prev) => prev + 1);
+    nextQuestion();
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
@@ -67,14 +73,20 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
 
   const handleCorrect = useCallback(() => {
     if (isGameOver) return;
-    processCorrect(); 
+    const result = processCorrect();
+    if (!result.didFire) return;
+
+    setScore((prev) => prev + 10);
     earnCoins(10); 
     
     if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      if (enemyHP > 0) nextQuestion(); 
-    }, 600);
-  }, [isGameOver, processCorrect, earnCoins, enemyHP, nextQuestion]);
+    if (result.nextEnemyHP > 0) {
+      timerRef.current = setTimeout(() => {
+        setCurrentQuestionIndex((prev) => prev + 1);
+        nextQuestion();
+      }, 600);
+    }
+  }, [isGameOver, processCorrect, earnCoins, nextQuestion]);
 
   const handleWrong = useCallback(() => {
     if (isGameOver) return;
@@ -84,7 +96,23 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
   }, [isGameOver, processWrong, loseCoins]);
 
   const handleRetry = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
     resetBattle();
+    setCurrentQuestionIndex(0);
+    setScore(0);
+    setUserInput('');
+    setBattleSessionId((prev) => prev + 1);
+    nextQuestion();
+  }, [resetBattle, nextQuestion]);
+
+  const handleContinue = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    resetBattle();
+    setCurrentQuestionIndex(0);
+    setScore(0);
+    setUserInput('');
+    setCurrentQuestion(null);
+    setBattleSessionId((prev) => prev + 1);
     nextQuestion();
   }, [resetBattle, nextQuestion]);
 
@@ -128,9 +156,14 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
     actionState,
     weaponRow,
     triggerEnergyCoreBurst,
+    battleSessionId,
+    currentQuestionIndex,
+    score,
   }), [
     actionState,
+    battleSessionId,
     combo,
+    currentQuestionIndex,
     enemyHP,
     maxHP,
     missileCol,
@@ -138,6 +171,7 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
     num2,
     operator,
     playerHP,
+    score,
     userInput,
     category,
     safeCurrentQuestion.hint,
@@ -145,8 +179,6 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
     triggerEnergyCoreBurst,
     weaponRow,
   ]);
-
-  const isGameReady = Boolean(gameLogic);
 
   return (
     <div className="stage-game-screen" style={{ height: '100dvh', minHeight: '100dvh', position: 'relative', backgroundColor: '#0a0a2a' }}>
@@ -206,7 +238,7 @@ const StageGameScreen = ({ category, subCategory, level, onBack }) => {
             </p>
             <div className="stage-game-screen__modal-actions">
               {isWin ? (
-                <button type="button" className="stage-game-screen__primary-button" onClick={onBack}>CONTINUE</button>
+                <button type="button" className="stage-game-screen__primary-button" onClick={handleContinue}>CONTINUE</button>
               ) : (
                 <>
                   <button type="button" className="stage-game-screen__primary-button" onClick={handleRetry}>RETRY</button>

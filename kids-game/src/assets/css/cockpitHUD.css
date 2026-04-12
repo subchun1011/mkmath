@@ -90,9 +90,9 @@
   position: absolute;
   bottom: clamp(38px, 7vh, 84px);
   left: 50%;
-  width: min(32vw, 236px);
+  width: min(38.4vw, 284px);
   height: auto;
-  min-height: 96px;
+  min-height: 116px;
   aspect-ratio: 578 / 432;
   transform: translateX(-50%);
   z-index: 20;
@@ -133,7 +133,7 @@
 
 .cockpit-hud__question {
   position: absolute;
-  inset: 12% 12% 10%;
+  inset: 11% 10% 9%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -192,8 +192,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  width: 78%;
-  max-width: 128px;
+  width: 82%;
+  max-width: 168px;
   margin: 0 auto;
   padding: 0;
   color: #00ffff;
@@ -218,7 +218,7 @@
 .vertical-math-problem .user-input {
   min-width: 1.1em;
   text-align: right;
-  font-size: clamp(0.82rem, 1.8vw, 1.15rem);
+  font-size: clamp(1.23rem, 2.7vw, 1.72rem);
   font-weight: 900;
   line-height: 1.05;
 }
@@ -244,7 +244,7 @@
 
 .cockpit-hud__question-hint {
   width: 100%;
-  font-size: clamp(0.45rem, 0.8vw, 0.62rem);
+  font-size: clamp(0.5rem, 0.9vw, 0.7rem);
   opacity: 0.88;
   position: relative;
   z-index: 1;
@@ -366,7 +366,7 @@
 
   .hologram-container {
     bottom: clamp(30px, 6vh, 64px);
-    width: min(46vw, 184px);
+    width: min(55vw, 220px);
   }
 
   .energy-core-container {
@@ -434,7 +434,7 @@
 
   .hologram-container {
     bottom: clamp(24px, 5vh, 52px);
-    width: min(46vw, 188px);
+    width: min(55vw, 226px);
   }
 
   .energy-core-container {

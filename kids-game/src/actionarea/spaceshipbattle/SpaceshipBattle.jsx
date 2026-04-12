@@ -17,6 +17,7 @@ const SpaceshipBattle = ({
   // 콤보에 따른 폭발 크기
   const explosionScale = 0.7 + (missileCol * 0.15);
   const [effectIndex, setEffectIndex] = useState(0);
+  const shipScale = 0.25;
   const shipState = 'still';
   const missileTier = `tier${Math.max(1, Math.min(5, missileCol + 1))}`;
 
@@ -66,7 +67,7 @@ const SpaceshipBattle = ({
                 <BattleShipSprite
                   type="ship_player"
                   state={shipState}
-                  scale={0.5}
+                  scale={shipScale}
                 />
               </div>
               
@@ -92,7 +93,7 @@ const SpaceshipBattle = ({
                 <BattleShipSprite
                   type="ship_enemy_sheet"
                   state="still"
-                  scale={0.5}
+                  scale={shipScale}
                 />
               </div>
               

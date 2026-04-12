@@ -13,11 +13,13 @@ function SpaceBattleArea({
   combo,
   weaponRow,
   missileCol,
+  battleSessionId,
 }) {
   return (
     <div className="space-battle-backdrop">
       <div className="cockpit-hud__space-stage">
         <SpaceshipBattle
+          key={`space-battle-${battleSessionId}`}
           playerHP={playerHP}
           enemyHP={enemyHP}
           maxHP={maxHP}
@@ -112,6 +114,7 @@ export default function CockpitHUD({ gameLogic }) {
     category = 'MISSION',
     hint = '',
     triggerEnergyCoreBurst,
+    battleSessionId = 0,
   } = gameLogic;
 
   const safeMaxHP = maxHP > 0 ? maxHP : 1;
@@ -163,6 +166,7 @@ export default function CockpitHUD({ gameLogic }) {
         combo={combo}
         weaponRow={weaponRow}
         missileCol={missileCol}
+        battleSessionId={battleSessionId}
       />
 
       <div className="cockpit-hud__bars">

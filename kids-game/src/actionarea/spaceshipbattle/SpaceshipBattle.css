@@ -56,11 +56,11 @@
 }
 
 .space-battle__ship--player {
-  left: 16%;
+  left: 14%;
 }
 
 .space-battle__ship--enemy {
-  right: 16%;
+  right: 14%;
 }
 
 .space-battle__ship-float,
@@ -201,6 +201,8 @@
   margin-bottom: 0;
   z-index: 6;
   background: transparent;
+  opacity: 0;
+  animation: vs-intro-fade 2.3s ease-out forwards;
 }
 
 @keyframes explosion-fade {
@@ -238,6 +240,34 @@
   }
 }
 
+@keyframes vs-intro-fade {
+  0% {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translate(-50%, -50%) scale(0.86);
+  }
+  14% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(-50%, -50%) scale(1);
+  }
+  44% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(-50%, -50%) scale(1);
+  }
+  72% {
+    opacity: 0.2;
+    filter: blur(4px);
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+}
+
 @media (max-width: 640px) {
   .space-battle__status-layer {
     top: 8px;
@@ -254,11 +284,11 @@
   }
 
   .space-battle__ship--player {
-    left: 8%;
+    left: 6%;
   }
 
   .space-battle__ship--enemy {
-    right: 8%;
+    right: 6%;
   }
 
   .animate-player {
