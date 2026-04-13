@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import StageGameScreen from './StageGameScreen';
+import MathCrosswordScreen from './crossword/MathCrosswordScreen.jsx';
 import SelectionScreen from './SelectionScreen';
 import { CoinProvider } from './coins/CoinContext'; // ⭐ 1. CoinProvider 임포트
 
 function AppContent() {
   const [scene, setScene] = useState('setup');
   const [gameConfig, setGameConfig] = useState(null); 
-  const [currentMissileTier, setCurrentMissileTier] = useState(1); 
 
   useEffect(() => {
     // 모바일 브라우저 주소창 문제를 해결하기 위한 높이 계산
@@ -50,13 +50,17 @@ function AppContent() {
     }}>
       {shouldShowSetup ? (
         <SelectionScreen onStartGame={handleStartGame} />
+      ) : gameConfig?.experience === 'crossword' ? (
+        <MathCrosswordScreen
+          category={gameConfig.category}
+          level={gameConfig.level}
+          onBack={handleBackToMenu}
+        />
       ) : (
         <StageGameScreen 
           category={gameConfig.category}
           subCategory={gameConfig.subCategory}
           level={gameConfig.level}
-          // ⭐ 코인 관련 데이터는 이제 StageGameScreen 내부에서 useCoins()로 직접 가져옵니다.
-          missileTier={currentMissileTier}
           onBack={handleBackToMenu}
         />
       )}
