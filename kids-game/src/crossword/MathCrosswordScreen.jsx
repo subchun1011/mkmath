@@ -2,15 +2,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   addCoins,
   setCrosswordProgress,
-  spendCoins,
   startCrosswordSession,
   subtractCoins,
   useCoinStore,
 } from '../store/useCoinStore.js';
 import { generateMathCrosswordGame } from './generateMathCrosswordGame.js';
 import './MathCrosswordScreen.css';
-
-const MAGIC_PEN_COST = 15;
 
 function initializeCrosswordSession(nextGame) {
   if (!nextGame) {
@@ -121,6 +118,7 @@ export default function MathCrosswordScreen({
   const [isOptionLocked, setIsOptionLocked] = useState(false);
   const [showWrongFlash, setShowWrongFlash] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [pressedAnswerCellId, setPressedAnswerCellId] = useState(null);
   const [, setNotice] = useState('');
 
   useEffect(() => {
@@ -131,6 +129,7 @@ export default function MathCrosswordScreen({
     setIsOptionLocked(false);
     setShowWrongFlash(false);
     setShowCompleteModal(false);
+    setPressedAnswerCellId(null);
     setNotice('');
     setGameState(null);
     setSelectedClueId(null);
@@ -213,6 +212,13 @@ export default function MathCrosswordScreen({
     setSelectedClueId(nextClue.id);
     setWrongClueId(null);
     setNotice('');
+
+    if (nextClue.blankCell.row === cell.row && nextClue.blankCell.col === cell.col) {
+      setPressedAnswerCellId(cell.id);
+      window.setTimeout(() => {
+        setPressedAnswerCellId((currentId) => (currentId === cell.id ? null : currentId));
+      }, 120);
+    }
   };
 
   const handleCorrectChoice = (clue) => {
@@ -287,22 +293,6 @@ export default function MathCrosswordScreen({
     handleWrongChoice(selectedClue, value);
   };
 
-  const handleMagicPen = () => {
-    if (!selectedClue || selectedClue.solved || showCompleteModal) {
-      return;
-    }
-
-    const didSpend = spendCoins(MAGIC_PEN_COST);
-
-    if (!didSpend) {
-      setNotice('코인이 부족해요. 먼저 문제를 맞혀 코인을 모아보자!');
-      return;
-    }
-
-    setNotice('매직 펜으로 빈칸 숫자를 반짝이며 채웠어요!');
-    handleCorrectChoice(selectedClue);
-  };
-
   const handleReplay = () => {
     const nextGame = generateMathCrosswordGame(level);
 
@@ -321,6 +311,7 @@ export default function MathCrosswordScreen({
     setIsOptionLocked(false);
     setShowWrongFlash(false);
     setShowCompleteModal(false);
+    setPressedAnswerCellId(null);
     setNotice('');
   };
 
@@ -368,6 +359,7 @@ export default function MathCrosswordScreen({
                   Boolean(selectedClue) &&
                   selectedClue.blankCell.row === cell.row &&
                   selectedClue.blankCell.col === cell.col;
+                const isAnswerCellPressed = pressedAnswerCellId === cell.id;
 
                 return (
                   <button
@@ -380,6 +372,7 @@ export default function MathCrosswordScreen({
                       isLineWrong ? 'is-line-wrong' : '',
                       isHighlighted ? 'is-line-correct' : '',
                       isAnswerCell ? 'is-answer-cell' : '',
+                      isAnswerCellPressed ? 'is-answer-cell-pressed' : '',
                     ].join(' ').trim()}
                     onClick={() => handleSelectCell(cell)}
                     disabled={cell.kind === 'wall'}
@@ -395,16 +388,6 @@ export default function MathCrosswordScreen({
 
         <section className="math-crossword__side-panel">
           <div className="math-crossword__hint-card">
-            <button
-              type="button"
-              className="math-crossword__magic-pen-icon"
-              onClick={handleMagicPen}
-              disabled={!selectedClue || selectedClue.solved || showCompleteModal}
-              aria-label={`매직 펜 사용, ${MAGIC_PEN_COST} 코인`}
-              title={`매직 펜 사용 (-${MAGIC_PEN_COST} 코인)`}
-            >
-              💡
-            </button>
             <VerticalHint hint={selectedClue?.hint} />
           </div>
 

@@ -303,6 +303,18 @@ function getMatchingCandidates(records, fixedChars, usedExpressions) {
   });
 }
 
+function verifySharedCells(grid, placement, record) {
+  return getPlacementCoordinates(placement).every(({ index, row, col }) => {
+    const cell = grid[row][col];
+
+    if (cell.kind === 'wall') {
+      return true;
+    }
+
+    return cell.solutionText === record.sequence[index];
+  });
+}
+
 function pickBlankMeta(record, fixedChars) {
   const candidates = shuffle(
     record.digitMetas.filter((digitMeta) => !fixedChars.has(digitMeta.index)),
@@ -349,6 +361,22 @@ function placeRecordOnGrid(grid, placement, record, blankMeta) {
   });
 
   return { nextGrid, blankCell };
+}
+
+function verifyCluePlacement(clue, record, blankMeta, blankCell) {
+  if (!verifyEquation(record.equation) || !blankCell) {
+    return false;
+  }
+
+  if (Number(blankMeta.char) !== clue.answerDigit) {
+    return false;
+  }
+
+  return (
+    clue.blankCell.row === blankCell.row &&
+    clue.blankCell.col === blankCell.col &&
+    record.sequence[blankMeta.index] === String(clue.answerDigit)
+  );
 }
 
 function createClue(placement, record, blankMeta, blankCell) {
@@ -435,6 +463,14 @@ function solvePlacements(grid, remainingPlacements, pools, usedExpressions, clue
   );
 
   for (const record of nextPlacementOption.matchingCandidates) {
+    if (!verifyEquation(record.equation)) {
+      continue;
+    }
+
+    if (!verifySharedCells(grid, nextPlacementOption.placement, record)) {
+      continue;
+    }
+
     const blankMeta = pickBlankMeta(record, nextPlacementOption.fixedChars);
 
     if (!blankMeta) {
@@ -448,6 +484,11 @@ function solvePlacements(grid, remainingPlacements, pools, usedExpressions, clue
       blankMeta,
     );
     const nextClue = createClue(nextPlacementOption.placement, record, blankMeta, blankCell);
+
+    if (!verifyCluePlacement(nextClue, record, blankMeta, blankCell)) {
+      continue;
+    }
+
     const solvedPuzzle = solvePlacements(
       nextGrid,
       nextRemainingPlacements,
