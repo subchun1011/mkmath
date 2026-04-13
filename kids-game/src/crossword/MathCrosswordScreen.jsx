@@ -93,9 +93,6 @@ function VerticalHint({ hint }) {
 
   return (
     <div className="math-crossword__hint-stack">
-      <div className="math-crossword__hint-place">{hint.placeLabel}</div>
-      <div className="math-crossword__hint-summary">{hint.summary}</div>
-      <div className="math-crossword__hint-guide">{hint.guide}</div>
       <div className="math-crossword__hint-number">{hint.top}</div>
       <div className="math-crossword__hint-operator-row">
         <span className="math-crossword__hint-operator">{hint.operator}</span>
@@ -103,7 +100,7 @@ function VerticalHint({ hint }) {
       </div>
       <div className="math-crossword__hint-line" />
       <div className="math-crossword__hint-number math-crossword__hint-number--answer">
-        {hint.result}
+        {hint.resultDisplay}
       </div>
     </div>
   );
@@ -124,7 +121,7 @@ export default function MathCrosswordScreen({
   const [isOptionLocked, setIsOptionLocked] = useState(false);
   const [showWrongFlash, setShowWrongFlash] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
-  const [notice, setNotice] = useState('');
+  const [, setNotice] = useState('');
 
   useEffect(() => {
     let isCancelled = false;
@@ -194,7 +191,6 @@ export default function MathCrosswordScreen({
     return selectedClue.choices.filter((choice) => !removedValues.includes(choice.value));
   }, [removedChoices, selectedClue]);
 
-  const solvedCount = gameState?.clues.filter((clue) => clue.solved).length || 0;
   const progressPercent = Math.round(
     (crosswordProgress.filledCells / Math.max(1, crosswordProgress.totalCells)) * 100,
   );
@@ -334,12 +330,24 @@ export default function MathCrosswordScreen({
         <button type="button" className="math-crossword__back" onClick={onBack}>
           Back
         </button>
-        <div className="math-crossword__header-copy">
-          <div className="math-crossword__eyebrow">MATH CROSSWORD</div>
-          <div className="math-crossword__title">레벨 {level} 숫자 미로 퍼즐</div>
-        </div>
+        <div className="math-crossword__level-pill">LV.{level}</div>
         <div className="math-crossword__coin-pill">{coins} COIN</div>
       </header>
+
+      <section className="math-crossword__progress-inline">
+        <div className="math-crossword__progress-inline-copy">
+          <span>
+            {crosswordProgress.filledCells} / {crosswordProgress.totalCells}
+          </span>
+          <span>{progressPercent}%</span>
+        </div>
+        <div className="math-crossword__progress-inline-track">
+          <div
+            className="math-crossword__progress-inline-fill"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+      </section>
 
       <main className="math-crossword__content">
         {!gameState ? (
@@ -350,25 +358,6 @@ export default function MathCrosswordScreen({
         ) : (
           <>
         <section className="math-crossword__board-panel">
-          <div className="math-crossword__progress">
-            <div className="math-crossword__progress-topline">
-              <span>채운 진행도 {crosswordProgress.filledCells} / {crosswordProgress.totalCells}</span>
-              <span>{progressPercent}%</span>
-            </div>
-            <div className="math-crossword__progress-track">
-              <div
-                className="math-crossword__progress-fill"
-                style={{ width: `${progressPercent}%` }}
-              />
-              <div
-                className="math-crossword__progress-star"
-                style={{ left: `calc(${progressPercent}% - 14px)` }}
-              >
-                ★
-              </div>
-            </div>
-          </div>
-
           <div className="math-crossword__board-shell">
             <div className="math-crossword__grid">
               {gameState.grid.flat().map((cell) => {
@@ -406,26 +395,20 @@ export default function MathCrosswordScreen({
 
         <section className="math-crossword__side-panel">
           <div className="math-crossword__hint-card">
-            <div className="math-crossword__card-title">힌트</div>
-            <div className="math-crossword__prompt">
-              {selectedClue ? selectedClue.prompt : '빈칸을 눌러 어떤 식을 풀지 골라보자!'}
-            </div>
-            <VerticalHint hint={selectedClue?.hint} />
             <button
               type="button"
-              className="math-crossword__magic-pen"
+              className="math-crossword__magic-pen-icon"
               onClick={handleMagicPen}
               disabled={!selectedClue || selectedClue.solved || showCompleteModal}
+              aria-label={`매직 펜 사용, ${MAGIC_PEN_COST} 코인`}
+              title={`매직 펜 사용 (-${MAGIC_PEN_COST} 코인)`}
             >
-              매직 펜 사용 (-{MAGIC_PEN_COST} 코인)
+              💡
             </button>
-            <div className="math-crossword__notice">
-              {notice || `${solvedCount}개의 수식을 풀었어. 다음 길도 찾아보자!`}
-            </div>
+            <VerticalHint hint={selectedClue?.hint} />
           </div>
 
           <div className="math-crossword__choices-card">
-            <div className="math-crossword__card-title">보기</div>
             <div className="math-crossword__choices">
               {visibleChoices.map((choice) => (
                 <button

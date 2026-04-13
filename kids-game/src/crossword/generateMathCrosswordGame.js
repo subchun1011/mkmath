@@ -122,55 +122,12 @@ function getPlaceLabel(digitsFromRight) {
 
 function buildHintFromEquation(equation, blankMeta) {
   const { left, right, result, operator } = equation;
-  const placeLabel = getPlaceLabel(blankMeta.digitsFromRight);
-
-  if (blankMeta.part === 'result') {
-    return {
-      top: left,
-      bottom: right,
-      operator,
-      result,
-      placeLabel,
-      summary: `${left} ${operator} ${right}`,
-      guide: `${placeLabel}를 맞추려면 계산 결과를 세로로 살펴보자!`,
-    };
-  }
-
-  if (operator === '+') {
-    const knownValue = blankMeta.part === 'left' ? right : left;
-    const unknownValue = blankMeta.part === 'left' ? left : right;
-
-    return {
-      top: result,
-      bottom: knownValue,
-      operator: '-',
-      result: unknownValue,
-      placeLabel,
-      summary: `${result} - ${knownValue}`,
-      guide: `${placeLabel}를 맞추려면 전체에서 알려진 수를 빼보자!`,
-    };
-  }
-
-  if (blankMeta.part === 'left') {
-    return {
-      top: result,
-      bottom: right,
-      operator: '+',
-      result: left,
-      placeLabel,
-      summary: `${result} + ${right}`,
-      guide: `${placeLabel}를 찾으려면 결과에 뺀 수를 다시 더해봐!`,
-    };
-  }
-
   return {
-    top: left,
-    bottom: result,
-    operator: '-',
-    result: right,
-    placeLabel,
-    summary: `${left} - ${result}`,
-    guide: `${placeLabel}를 찾으려면 원래 수에서 결과를 빼보자!`,
+    top: blankMeta.part === 'left' ? '?' : String(left),
+    bottom: blankMeta.part === 'right' ? '?' : String(right),
+    operator,
+    resultDisplay: blankMeta.part === 'result' ? '?' : String(result),
+    placeLabel: getPlaceLabel(blankMeta.digitsFromRight),
   };
 }
 
