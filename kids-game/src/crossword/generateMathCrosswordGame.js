@@ -4,79 +4,67 @@ const PREFILLED_RATIO = 0.2;
 const equationPoolCache = new Map();
 
 const PATTERN_DEFINITIONS = {
-  'double-op-double': {
-    length: 8,
-    digitIndices: [0, 1, 3, 4, 6, 7],
-  },
-  'double-op-single': {
-    length: 7,
-    digitIndices: [0, 1, 3, 5, 6],
-  },
+  'two-add-two': { length: 8, operator: '+' },
+  'two-sub-two': { length: 8, operator: '-' },
+  'three-add-two': { length: 10, operator: '+' },
+  'two-add-three': { length: 10, operator: '+' },
+  'three-sub-two': { length: 10, operator: '-' },
+  'two-mul-two': { length: 9, operator: '×' },
+  'two-div-two': { length: 7, operator: '÷' },
 };
 
-const PLACEMENTS = [
-  { id: 'across-1', row: 1, col: 1, direction: 'across', pattern: 'double-op-double' },
-  { id: 'across-2', row: 4, col: 1, direction: 'across', pattern: 'double-op-single' },
-  { id: 'across-3', row: 7, col: 2, direction: 'across', pattern: 'double-op-single' },
-  { id: 'down-1', row: 1, col: 2, direction: 'down', pattern: 'double-op-single' },
-  { id: 'down-3', row: 1, col: 7, direction: 'down', pattern: 'double-op-single' },
-].map((placement) => ({
-  ...placement,
-  length: PATTERN_DEFINITIONS[placement.pattern].length,
-}));
+const LEVEL_LIMITS = {
+  1: { twoDigitMin: 10, twoDigitMax: 49, threeDigitMin: 100, threeDigitMax: 199, multiplyMax: 14, divisionMax: 12 },
+  2: { twoDigitMin: 10, twoDigitMax: 99, threeDigitMin: 100, threeDigitMax: 299, multiplyMax: 16, divisionMax: 12 },
+  3: { twoDigitMin: 10, twoDigitMax: 99, threeDigitMin: 100, threeDigitMax: 399, multiplyMax: 18, divisionMax: 14 },
+  4: { twoDigitMin: 10, twoDigitMax: 99, threeDigitMin: 100, threeDigitMax: 699, multiplyMax: 19, divisionMax: 15 },
+  5: { twoDigitMin: 10, twoDigitMax: 99, threeDigitMin: 100, threeDigitMax: 999, multiplyMax: 24, divisionMax: 18 },
+};
 
-const FALLBACK_BLUEPRINTS = [
-  {
-    placementId: 'across-1',
-    equation: { left: 21, right: 10, result: 11, operator: '-' },
-    blankIndex: 3,
-  },
-  {
-    placementId: 'across-2',
-    equation: { left: 28, right: 9, result: 37, operator: '+' },
-    blankIndex: 5,
-  },
-  {
-    placementId: 'across-3',
-    equation: { left: 29, right: 7, result: 22, operator: '-' },
-    blankIndex: 1,
-  },
-  {
-    placementId: 'down-1',
-    equation: { left: 14, right: 8, result: 22, operator: '+' },
-    blankIndex: 1,
-  },
-  {
-    placementId: 'down-3',
-    equation: { left: 15, right: 7, result: 22, operator: '+' },
-    blankIndex: 5,
-  },
-];
-
-function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+const FALLBACK_BLUEPRINTS = {
+  1: [
+    { placementId: 'across-1', equation: { left: 24, right: 15, result: 39, operator: '+' }, blankIndex: 6 },
+    { placementId: 'across-2', equation: { left: 31, right: 12, result: 43, operator: '+' }, blankIndex: 3 },
+    { placementId: 'across-3', equation: { left: 22, right: 16, result: 38, operator: '+' }, blankIndex: 7 },
+    { placementId: 'down-1', equation: { left: 14, right: 12, result: 26, operator: '+' }, blankIndex: 3 },
+    { placementId: 'down-2', equation: { left: 15, right: 24, result: 39, operator: '+' }, blankIndex: 6 },
+  ],
+  2: [
+    { placementId: 'across-1', equation: { left: 45, right: 12, result: 33, operator: '-' }, blankIndex: 6 },
+    { placementId: 'across-2', equation: { left: 23, right: 18, result: 41, operator: '+' }, blankIndex: 3 },
+    { placementId: 'across-3', equation: { left: 54, right: 11, result: 43, operator: '-' }, blankIndex: 7 },
+    { placementId: 'down-1', equation: { left: 16, right: 12, result: 28, operator: '+' }, blankIndex: 3 },
+    { placementId: 'down-2', equation: { left: 66, right: 33, result: 33, operator: '-' }, blankIndex: 4 },
+  ],
+  3: [
+    { placementId: 'across-1', equation: { left: 125, right: 34, result: 159, operator: '+' }, blankIndex: 7 },
+    { placementId: 'across-2', equation: { left: 342, right: 21, result: 321, operator: '-' }, blankIndex: 4 },
+    { placementId: 'across-3', equation: { left: 140, right: 25, result: 165, operator: '+' }, blankIndex: 9 },
+    { placementId: 'down-1', equation: { left: 214, right: 31, result: 245, operator: '+' }, blankIndex: 7 },
+    { placementId: 'down-2', equation: { left: 387, right: 42, result: 345, operator: '-' }, blankIndex: 9 },
+  ],
+  4: [
+    { placementId: 'across-1', equation: { left: 100, right: 10, result: 110, operator: '+' }, blankIndex: 7 },
+    { placementId: 'across-2', equation: { left: 11, right: 11, result: 121, operator: '×' }, blankIndex: 6 },
+    { placementId: 'across-3', equation: { left: 110, right: 10, result: 100, operator: '-' }, blankIndex: 8 },
+    { placementId: 'down-1', equation: { left: 10, right: 11, result: 110, operator: '×' }, blankIndex: 7 },
+    { placementId: 'down-2', equation: { left: 110, right: 10, result: 120, operator: '+' }, blankIndex: 7 },
+  ],
+  5: [
+    { placementId: 'across-1', equation: { left: 120, right: 10, result: 130, operator: '+' }, blankIndex: 7 },
+    { placementId: 'across-2', equation: { left: 11, right: 11, result: 121, operator: '×' }, blankIndex: 6 },
+    { placementId: 'across-3', equation: { left: 120, right: 10, result: 110, operator: '-' }, blankIndex: 8 },
+    { placementId: 'down-1', equation: { left: 20, right: 10, result: 2, operator: '÷' }, blankIndex: 4 },
+    { placementId: 'down-2', equation: { left: 110, right: 10, result: 120, operator: '+' }, blankIndex: 7 },
+  ],
+};
 
 function shuffle(items) {
   return [...items].sort(() => Math.random() - 0.5);
 }
 
 function getLevelLimits(level) {
-  const safeLevel = Math.min(5, Math.max(1, Number(level) || 1));
-
-  switch (safeLevel) {
-    case 1:
-      return { maxDouble: 19 };
-    case 2:
-      return { maxDouble: 29 };
-    case 3:
-      return { maxDouble: 39 };
-    case 4:
-      return { maxDouble: 59 };
-    case 5:
-    default:
-      return { maxDouble: 89 };
-  }
+  return LEVEL_LIMITS[level] || LEVEL_LIMITS[5];
 }
 
 function createWallCell(row, col) {
@@ -122,6 +110,7 @@ function getPlaceLabel(digitsFromRight) {
 
 function buildHintFromEquation(equation, blankMeta) {
   const { left, right, result, operator } = equation;
+
   return {
     top: blankMeta.part === 'left' ? '?' : String(left),
     bottom: blankMeta.part === 'right' ? '?' : String(right),
@@ -138,6 +127,18 @@ function evaluateEquation(equation) {
 
   if (equation.operator === '-') {
     return equation.left - equation.right;
+  }
+
+  if (equation.operator === '×') {
+    return equation.left * equation.right;
+  }
+
+  if (equation.operator === '÷') {
+    if (equation.right === 0 || equation.left % equation.right !== 0) {
+      return Number.NaN;
+    }
+
+    return equation.left / equation.right;
   }
 
   return Number.NaN;
@@ -200,69 +201,198 @@ function addEquation(records, equation, expectedLength, seenTexts) {
   records.push(record);
 }
 
-function buildEquationPools(level) {
-  if (equationPoolCache.has(level)) {
-    return equationPoolCache.get(level);
+function populatePatternRecords(patternId, limits) {
+  const pattern = PATTERN_DEFINITIONS[patternId];
+  const records = [];
+  const seenTexts = new Set();
+  const { twoDigitMin, twoDigitMax, threeDigitMin, threeDigitMax, multiplyMax, divisionMax } = limits;
+
+  if (patternId === 'two-add-two') {
+    for (let left = twoDigitMin; left <= twoDigitMax; left += 1) {
+      for (let right = twoDigitMin; right <= twoDigitMax; right += 1) {
+        const result = left + right;
+
+        if (result >= 10 && result <= 99) {
+          addEquation(records, { left, right, result, operator: '+' }, pattern.length, seenTexts);
+        }
+      }
+    }
   }
 
-  const limits = getLevelLimits(level);
-  const { maxDouble } = limits;
-  const pools = new Map();
+  if (patternId === 'two-sub-two') {
+    for (let left = twoDigitMin; left <= twoDigitMax; left += 1) {
+      for (let right = twoDigitMin; right < left; right += 1) {
+        const result = left - right;
 
-  Object.keys(PATTERN_DEFINITIONS).forEach((patternId) => {
-    pools.set(patternId, []);
+        if (result >= 10 && result <= 99) {
+          addEquation(records, { left, right, result, operator: '-' }, pattern.length, seenTexts);
+        }
+      }
+    }
+  }
+
+  if (patternId === 'three-add-two') {
+    for (let left = threeDigitMin; left <= threeDigitMax; left += 1) {
+      for (let right = twoDigitMin; right <= twoDigitMax; right += 1) {
+        const result = left + right;
+
+        if (result >= 100 && result <= 999) {
+          addEquation(records, { left, right, result, operator: '+' }, pattern.length, seenTexts);
+        }
+      }
+    }
+  }
+
+  if (patternId === 'two-add-three') {
+    for (let left = twoDigitMin; left <= twoDigitMax; left += 1) {
+      for (let right = threeDigitMin; right <= threeDigitMax; right += 1) {
+        const result = left + right;
+
+        if (result >= 100 && result <= 999) {
+          addEquation(records, { left, right, result, operator: '+' }, pattern.length, seenTexts);
+        }
+      }
+    }
+  }
+
+  if (patternId === 'three-sub-two') {
+    for (let left = threeDigitMin; left <= threeDigitMax; left += 1) {
+      for (let right = twoDigitMin; right <= twoDigitMax; right += 1) {
+        const result = left - right;
+
+        if (result >= 100 && result <= 999) {
+          addEquation(records, { left, right, result, operator: '-' }, pattern.length, seenTexts);
+        }
+      }
+    }
+  }
+
+  if (patternId === 'two-mul-two') {
+    for (let left = 10; left <= multiplyMax; left += 1) {
+      for (let right = 10; right <= multiplyMax; right += 1) {
+        const result = left * right;
+
+        if (result >= 100 && result <= 999) {
+          addEquation(records, { left, right, result, operator: '×' }, pattern.length, seenTexts);
+        }
+      }
+    }
+  }
+
+  if (patternId === 'two-div-two') {
+    for (let right = 10; right <= divisionMax; right += 1) {
+      for (let result = 2; result <= 9; result += 1) {
+        const left = right * result;
+
+        if (left >= 10 && left <= 99) {
+          addEquation(records, { left, right, result, operator: '÷' }, pattern.length, seenTexts);
+        }
+      }
+    }
+  }
+
+  return shuffle(records);
+}
+
+function buildEquationPools(level, placements) {
+  const limits = getLevelLimits(level);
+  const pools = new Map();
+  const uniquePatternIds = new Set(placements.flatMap((placement) => placement.patternIds));
+
+  uniquePatternIds.forEach((patternId) => {
+    const cacheKey = `${level}:${patternId}`;
+
+    if (!equationPoolCache.has(cacheKey)) {
+      equationPoolCache.set(cacheKey, populatePatternRecords(patternId, limits));
+    }
+
+    pools.set(patternId, equationPoolCache.get(cacheKey));
   });
 
-  const seenByPattern = new Map(
-    Object.keys(PATTERN_DEFINITIONS).map((patternId) => [patternId, new Set()]),
-  );
+  return pools;
+}
 
-  for (let left = 10; left <= maxDouble; left += 1) {
-    for (let right = 10; right <= maxDouble; right += 1) {
-      addEquation(
-        pools.get('double-op-double'),
-        { left, right, result: left + right, operator: '+' },
-        PATTERN_DEFINITIONS['double-op-double'].length,
-        seenByPattern.get('double-op-double'),
-      );
-    }
+function createPlacement({ id, row, col, direction, patternIds }) {
+  return {
+    id,
+    row,
+    col,
+    direction,
+    patternIds,
+    length: PATTERN_DEFINITIONS[patternIds[0]].length,
+  };
+}
+
+function buildLevelPlacements(level) {
+  if (level === 1) {
+    return [
+      createPlacement({ id: 'across-1', row: 1, col: 0, direction: 'across', patternIds: ['two-add-two'] }),
+      createPlacement({ id: 'across-2', row: 4, col: 0, direction: 'across', patternIds: ['two-add-two'] }),
+      createPlacement({ id: 'across-3', row: 7, col: 0, direction: 'across', patternIds: ['two-add-two'] }),
+      createPlacement({ id: 'down-1', row: 0, col: 1, direction: 'down', patternIds: ['two-add-two'] }),
+      createPlacement({ id: 'down-2', row: 0, col: 4, direction: 'down', patternIds: ['two-add-two'] }),
+    ];
   }
 
-  for (let left = 10; left <= maxDouble; left += 1) {
-    for (let right = 10; right < left; right += 1) {
-      addEquation(
-        pools.get('double-op-double'),
-        { left, right, result: left - right, operator: '-' },
-        PATTERN_DEFINITIONS['double-op-double'].length,
-        seenByPattern.get('double-op-double'),
-      );
-    }
+  if (level === 2) {
+    const operators = shuffle(['two-add-two', 'two-sub-two', 'two-add-two', 'two-sub-two', 'two-add-two']);
+
+    return [
+      createPlacement({ id: 'across-1', row: 1, col: 0, direction: 'across', patternIds: [operators[0]] }),
+      createPlacement({ id: 'across-2', row: 4, col: 0, direction: 'across', patternIds: [operators[1]] }),
+      createPlacement({ id: 'across-3', row: 7, col: 0, direction: 'across', patternIds: [operators[2]] }),
+      createPlacement({ id: 'down-1', row: 0, col: 1, direction: 'down', patternIds: [operators[3]] }),
+      createPlacement({ id: 'down-2', row: 0, col: 4, direction: 'down', patternIds: [operators[4]] }),
+    ];
   }
 
-  for (let left = 10; left <= maxDouble; left += 1) {
-    for (let right = 1; right <= 9; right += 1) {
-      addEquation(
-        pools.get('double-op-single'),
-        { left, right, result: left + right, operator: '+' },
-        PATTERN_DEFINITIONS['double-op-single'].length,
-        seenByPattern.get('double-op-single'),
-      );
+  if (level === 3) {
+    const plusMinusPatterns = shuffle([
+      ['three-add-two', 'two-add-three'],
+      ['three-sub-two'],
+      ['three-add-two', 'two-add-three'],
+      ['three-sub-two'],
+      ['three-add-two', 'two-add-three'],
+    ]);
 
-      addEquation(
-        pools.get('double-op-single'),
-        { left, right, result: left - right, operator: '-' },
-        PATTERN_DEFINITIONS['double-op-single'].length,
-        seenByPattern.get('double-op-single'),
-      );
-    }
+    return [
+      createPlacement({ id: 'across-1', row: 1, col: 0, direction: 'across', patternIds: plusMinusPatterns[0] }),
+      createPlacement({ id: 'across-2', row: 4, col: 0, direction: 'across', patternIds: plusMinusPatterns[1] }),
+      createPlacement({ id: 'across-3', row: 7, col: 0, direction: 'across', patternIds: plusMinusPatterns[2] }),
+      createPlacement({ id: 'down-1', row: 0, col: 1, direction: 'down', patternIds: plusMinusPatterns[3] }),
+      createPlacement({ id: 'down-2', row: 0, col: 4, direction: 'down', patternIds: plusMinusPatterns[4] }),
+    ];
   }
 
-  const shuffledPools = new Map(
-    [...pools.entries()].map(([patternId, records]) => [patternId, shuffle(records)]),
-  );
+  if (level === 4) {
+    const plusMinusPatterns = shuffle([
+      ['three-add-two', 'two-add-three'],
+      ['three-sub-two'],
+      ['three-add-two', 'two-add-three'],
+    ]);
 
-  equationPoolCache.set(level, shuffledPools);
-  return shuffledPools;
+    return [
+      createPlacement({ id: 'across-1', row: 1, col: 0, direction: 'across', patternIds: plusMinusPatterns[0] }),
+      createPlacement({ id: 'across-2', row: 4, col: 0, direction: 'across', patternIds: ['two-mul-two'] }),
+      createPlacement({ id: 'across-3', row: 7, col: 0, direction: 'across', patternIds: plusMinusPatterns[1] }),
+      createPlacement({ id: 'down-1', row: 0, col: 1, direction: 'down', patternIds: ['two-mul-two'] }),
+      createPlacement({ id: 'down-2', row: 0, col: 4, direction: 'down', patternIds: plusMinusPatterns[2] }),
+    ];
+  }
+
+  const plusMinusPatterns = shuffle([
+    ['three-add-two', 'two-add-three'],
+    ['three-sub-two'],
+    ['three-add-two', 'two-add-three'],
+  ]);
+
+  return [
+    createPlacement({ id: 'across-1', row: 1, col: 0, direction: 'across', patternIds: plusMinusPatterns[0] }),
+    createPlacement({ id: 'across-2', row: 4, col: 0, direction: 'across', patternIds: ['two-mul-two'] }),
+    createPlacement({ id: 'across-3', row: 7, col: 0, direction: 'across', patternIds: plusMinusPatterns[1] }),
+    createPlacement({ id: 'down-1', row: 1, col: 1, direction: 'down', patternIds: ['two-div-two'] }),
+    createPlacement({ id: 'down-2', row: 0, col: 4, direction: 'down', patternIds: plusMinusPatterns[2] }),
+  ];
 }
 
 function getPlacementCoordinates(placement) {
@@ -287,20 +417,24 @@ function getFixedChars(grid, placement) {
   return fixedChars;
 }
 
-function getMatchingCandidates(records, fixedChars, usedExpressions) {
-  return records.filter((record) => {
-    if (usedExpressions.has(record.fullText)) {
-      return false;
-    }
+function getPlacementCandidates(placement, pools, fixedChars, usedExpressions) {
+  return shuffle(
+    placement.patternIds.flatMap((patternId) =>
+      (pools.get(patternId) || []).filter((record) => {
+        if (usedExpressions.has(record.fullText)) {
+          return false;
+        }
 
-    for (const [index, char] of fixedChars.entries()) {
-      if (record.sequence[index] !== char) {
-        return false;
-      }
-    }
+        for (const [index, char] of fixedChars.entries()) {
+          if (record.sequence[index] !== char) {
+            return false;
+          }
+        }
 
-    return true;
-  });
+        return true;
+      }),
+    ),
+  );
 }
 
 function verifySharedCells(grid, placement, record) {
@@ -438,11 +572,7 @@ function solvePlacements(grid, remainingPlacements, pools, usedExpressions, clue
   const placementOptions = remainingPlacements
     .map((placement) => {
       const fixedChars = getFixedChars(grid, placement);
-      const matchingCandidates = getMatchingCandidates(
-        pools.get(placement.pattern) || [],
-        fixedChars,
-        usedExpressions,
-      );
+      const matchingCandidates = getPlacementCandidates(placement, pools, fixedChars, usedExpressions);
 
       return {
         placement,
@@ -505,14 +635,17 @@ function solvePlacements(grid, remainingPlacements, pools, usedExpressions, clue
   return null;
 }
 
-function buildFallbackPuzzle(level) {
+function buildFallbackPuzzle(level, placements) {
   const fallbackMap = new Map(
-    FALLBACK_BLUEPRINTS.map((blueprint) => [blueprint.placementId, blueprint]),
+    (FALLBACK_BLUEPRINTS[level] || FALLBACK_BLUEPRINTS[1]).map((blueprint) => [
+      blueprint.placementId,
+      blueprint,
+    ]),
   );
   let workingGrid = createEmptyGrid();
   const clues = [];
 
-  for (const placement of PLACEMENTS) {
+  for (const placement of placements) {
     const blueprint = fallbackMap.get(placement.id);
 
     if (!blueprint) {
@@ -522,7 +655,11 @@ function buildFallbackPuzzle(level) {
     const record = createEquationRecord(blueprint.equation);
     const blankMeta = record?.digitMetas.find((digitMeta) => digitMeta.index === blueprint.blankIndex);
 
-    if (!record || !blankMeta) {
+    if (!record || !blankMeta || record.sequence.length !== placement.length) {
+      continue;
+    }
+
+    if (!verifySharedCells(workingGrid, placement, record)) {
       continue;
     }
 
@@ -542,8 +679,9 @@ function buildFallbackPuzzle(level) {
 }
 
 function buildPuzzle(level) {
-  const pools = buildEquationPools(level);
-  const solvedPuzzle = solvePlacements(createEmptyGrid(), PLACEMENTS, pools, new Set(), []);
+  const placements = buildLevelPlacements(level);
+  const pools = buildEquationPools(level, placements);
+  const solvedPuzzle = solvePlacements(createEmptyGrid(), placements, pools, new Set(), []);
 
   if (!solvedPuzzle) {
     return null;
@@ -561,6 +699,7 @@ function buildPuzzle(level) {
 
 export function generateMathCrosswordGame(level = 1) {
   const safeLevel = Math.min(5, Math.max(1, Number(level) || 1));
+  const placements = buildLevelPlacements(safeLevel);
 
-  return buildPuzzle(safeLevel) || buildFallbackPuzzle(safeLevel);
+  return buildPuzzle(safeLevel) || buildFallbackPuzzle(safeLevel, placements);
 }
