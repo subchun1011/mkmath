@@ -11,6 +11,10 @@
   --accent-blue: #92d6ff;
   --accent-highlight: rgba(255, 228, 138, 0.7);
   --accent-red: rgba(255, 98, 117, 0.8);
+  --header-band: 5%;
+  --grid-band: 55%;
+  --hint-band: 15%;
+  --answer-band: 25%;
   position: relative;
   width: 100%;
   height: 100dvh;
@@ -123,11 +127,11 @@
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
-  flex-direction: row;
-  align-items: stretch;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  gap: clamp(8px, 1.2vw, 12px);
-  padding: 0 1.5% calc(6px + env(safe-area-inset-bottom, 0px));
+  gap: 4px;
+  padding: 0 1.5% calc(4px + env(safe-area-inset-bottom, 0px));
   overflow: hidden;
 }
 
@@ -166,19 +170,21 @@
 }
 
 .math-crossword__board-panel {
-  flex: 1.15 1 0;
+  flex: 0 0 var(--grid-band);
   width: min(96vw, 680px);
   min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 6px;
-  border-radius: 28px;
+  align-items: center;
+  padding: 4px;
+  border-radius: 24px;
   overflow: hidden;
 }
 
 .math-crossword__board-shell {
-  width: min(96vw, 100%);
+  width: min(92vw, 100%);
   max-width: 100%;
   aspect-ratio: 1 / 1;
   margin: 0 auto;
@@ -303,9 +309,9 @@
 }
 
 .math-crossword__side-panel {
-  flex: 0.85 1 0;
-  width: min(34vw, 360px);
-  min-width: 240px;
+  flex: 0 0 calc(var(--hint-band) + var(--answer-band));
+  width: min(92vw, 680px);
+  min-width: 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -315,16 +321,17 @@
 .math-crossword__hint-card,
 .math-crossword__choices-card {
   position: relative;
-  padding: 8px;
-  border-radius: 28px;
+  padding: 6px;
+  border-radius: 22px;
   overflow: hidden;
 }
 
 .math-crossword__hint-stack {
   height: 100%;
-  min-height: clamp(82px, 11.5vh, 112px);
-  padding: 8px 12px 6px;
-  border-radius: 24px;
+  max-height: 15vh;
+  min-height: clamp(66px, 9.5vh, 92px);
+  padding: 6px 10px 4px;
+  border-radius: 18px;
   background: linear-gradient(180deg, #fffdf7 0%, #eefbff 100%);
   font-family: 'Courier New', monospace;
   color: #4f4a72;
@@ -332,13 +339,13 @@
 
 .math-crossword__hint-number,
 .math-crossword__hint-operator {
-  font-size: clamp(1.18rem, 2.35vw, 1.56rem);
+  font-size: clamp(1rem, 2vw, 1.28rem);
   font-weight: 900;
   line-height: 1.1;
 }
 
 .math-crossword__hint-number {
-  margin-top: 4px;
+  margin-top: 2px;
   text-align: right;
 }
 
@@ -354,8 +361,8 @@
 }
 
 .math-crossword__hint-line {
-  height: 3px;
-  margin: 6px 0 4px;
+  height: 2px;
+  margin: 5px 0 3px;
   border-radius: 999px;
   background: linear-gradient(90deg, #ffcc76 0%, #95d6ff 100%);
 }
@@ -364,22 +371,33 @@
   color: #53af8f;
 }
 
+.math-crossword__hint-card {
+  flex: 0 0 var(--hint-band);
+  min-height: 0;
+}
+
+.math-crossword__choices-card {
+  flex: 0 0 var(--answer-band);
+  min-height: 0;
+}
+
 .math-crossword__choices {
   height: 100%;
   align-content: center;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 6px;
+  gap: 5px;
 }
 
 .math-crossword__choice {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  height: clamp(32px, 4.2vh, 35px);
   min-height: 0;
-  padding: 0.2em;
+  padding: 0 0.35em;
+  border-radius: 12px;
   background: linear-gradient(180deg, #ffffff 0%, #dff4ff 100%);
   color: #487099;
-  font-size: clamp(0.94rem, 2.1vw, 1.16rem);
+  font-size: clamp(0.9rem, 1.9vw, 1.08rem);
   box-shadow: 0 10px 16px rgba(146, 214, 255, 0.18);
 }
 
@@ -492,32 +510,24 @@
 
 @keyframes puzzle-answer-pulse {
   0% {
-    transform: scale(1);
+    transform: translateY(0);
   }
   50% {
-    transform: scale(1.05);
+    transform: translateY(2px);
   }
   100% {
-    transform: scale(1);
+    transform: translateY(0);
   }
 }
 
 @media (max-width: 768px) {
-  .math-crossword__content {
-    flex-direction: column;
-    align-items: center;
-  }
-
   .math-crossword__board-panel {
-    width: 96vw;
-    flex: 1.1 1 0;
+    width: 94vw;
   }
 
   .math-crossword__side-panel {
     width: 96vw;
-    min-width: 0;
-    flex: 0.9 1 0;
-    gap: 4px;
+    gap: 3px;
   }
 }
 
@@ -551,7 +561,20 @@
     border-radius: 22px;
   }
 
+  .math-crossword__board-shell,
+  .math-crossword__side-panel {
+    width: 94vw;
+  }
+
+  .math-crossword__hint-stack {
+    min-height: clamp(60px, 8.8vh, 82px);
+  }
+
+  .math-crossword__choice {
+    height: clamp(30px, 4vh, 34px);
+  }
+
   .math-crossword__choices {
-    gap: 8px;
+    gap: 4px;
   }
 }
